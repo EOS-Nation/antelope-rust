@@ -1,8 +1,8 @@
 #![allow(dead_code, unused)]
-use std::fmt;
 use std::cmp::Eq;
 use std::cmp::PartialEq;
 use std::convert::From;
+use std::fmt;
 use std::ops::Not;
 
 #[derive(Debug)]
@@ -69,7 +69,9 @@ impl fmt::Display for SymbolCode {
         let mut i = 0;
 
         while (i < 7) {
-            if (v == 0) { break; }
+            if (v == 0) {
+                break;
+            }
             let c = (v & mask) as u8 as char;
             begin.push(c);
             v >>= 8;
