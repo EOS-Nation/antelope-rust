@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/EOS-Nation/antelope-rust/actions/workflows/test.yml/badge.svg)](https://github.com/EOS-Nation/antelope-rust/actions/workflows/test.yml)
 ![License](https://img.shields.io/github/license/EOS-Nation/antelope-rust)
+![Crates.io](https://img.shields.io/crates/v/antelope)
 
 > Antelope common library.
 
