@@ -16,20 +16,19 @@ body:
   - type: textarea
     id: custom
     attributes:
-      label: "Custom Types"
+      label: "Custom Antelope Types"
       description: Please enter the list of custom types to be supported
       value: |
         - [ ] length
         - [ ] is_valid
         - [ ] raw
-      render: markdown
     validations:
       required: true
 
   - type: textarea
     id: standard
     attributes:
-      label: "Standard Types"
+      label: "Standard Rust Types"
       description: Please enter the list of standard types to be supported
       value: |
         - [ ] `origin`
@@ -49,14 +48,13 @@ body:
           - [ ] `From<String>`
           - [ ] `From<&str>`
           - [ ] `From<MyType> for bool`
-      render: markdown
     validations:
       required: true
 
   - type: textarea
     id: operators
     attributes:
-      label: "Operators Types"
+      label: "Operators Rust Types"
       description: Please enter the list of [operators](https://doc.rust-lang.org/book/appendix-02-operators.html) types to be supported
       value: |
         - `PartialEq`
@@ -86,8 +84,7 @@ body:
         - `Div`
           - [ ] expr / expr	
         - `DivAssign`
-          - [ ] var /= expr	
-      render: markdown
+          - [ ] var /= expr
     validations:
       required: true
 
