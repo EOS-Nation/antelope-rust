@@ -1,0 +1,15 @@
+[package]
+name = "antelope"
+version = "0.0.1"
+authors = ["Denis Carriere <denis@eosnation.io>"]
+description = "Antelope common library"
+homepage = "https://github.com/EOS-Nation/antelope-rust"
+repository = "https://github.com/EOS-Nation/antelope-rust"
+categories = [ "api-bindings", "cryptography::cryptocurrencies", "data-structures", "parsing", "value-formatting"]
+keywords = ["antelope", "eos", "eosio", "blockchain", "crypto", "dapp"]
+readme = "README.md"
+license = "MIT OR Apache-2.0"
+edition = "2021"
+
+[badges]
+maintenance = { status = "actively-developed" }
