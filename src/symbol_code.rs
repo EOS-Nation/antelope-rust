@@ -2,7 +2,7 @@
 
 #![allow(dead_code, unused)]
 use std::clone::Clone;
-use std::cmp::PartialEq;
+use std::cmp::{PartialEq, PartialOrd};
 use std::convert::From;
 use std::fmt::{Display, Formatter, Result};
 use std::ops::Not;
