@@ -3,7 +3,11 @@
 [![Build Status](https://github.com/EOS-Nation/antelope-rust/actions/workflows/test.yml/badge.svg)](https://github.com/EOS-Nation/antelope-rust/actions/workflows/test.yml)
 ![License](https://img.shields.io/github/license/EOS-Nation/antelope-rust)
 
-> Antelope common library. Implements most commonly used Antelop (EOSIO) C++ Classes into Rust.
+> Antelope common library.
+
+Implements most commonly used Antelop (EOSIO) C++ Classes into Rust.
+
+## Support for
 
 - [ ] asset
 - [ ] symbol
