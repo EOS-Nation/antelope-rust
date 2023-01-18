@@ -1,0 +1,58 @@
+name: "🛠 Add Type"
+description: Create a new ticket for a new type.
+title: "🛠 [TYPE] - <title>"
+labels: [
+  "type"
+]
+body:
+  - type: input
+    id: reference-url
+    attributes:
+      label: "Reference URL"
+      description: Please enter your GitHub URL to provide a code reference of type
+      placeholder: ex. https://github.com/USERNAME/REPO-NAME
+    validations:
+      required: true
+  - type: textarea
+    id: custom
+    attributes:
+      label: "Custom Types"
+      description: Please enter the list of custom types to be supported
+      value: |
+        ## Custom
+        - [ ] suffix()
+        - [ ] prefix()
+      render: bash
+    validations:
+      required: true
+
+  - type: textarea
+    id: standard
+    attributes:
+      label: "Standard Types"
+      description: Please enter the list of standard types to be supported
+      value: |
+        ## Standard
+        - [ ] raw
+        - [ ] origin
+        - [ ] new
+        - [ ] length
+        - [ ] is_valid
+        - [ ] not
+        - [ ] as_ref
+        - `AsBool`
+          - [ ] as_bool
+        - `std::clone`
+          - [ ] Clone
+        - `std::fmt`
+          - [ ] `{Result, Formatter, Display}`
+        - `std::cmp`
+          - [ ] PartialEq
+        - `std::convert::From`
+          - [ ] From<u64>
+          - [ ] From<String>
+          - [ ] From<&str>
+          - [ ] From<MyType> for bool
+      render: bash
+    validations:
+      required: true
