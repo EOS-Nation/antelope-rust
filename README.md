@@ -1,4 +1,4 @@
-# `Antelope` Standard Library for `Rust`
+# [`Antelope`](https://antelope.io/) Standard Library for [`Rust`](https://www.rust-lang.org/)
 
 [![Build Status](https://github.com/pinax-network/antelope-rust/actions/workflows/test.yml/badge.svg)](https://github.com/pinax-network/antelope-rust/actions/workflows/test.yml)
 ![License](https://img.shields.io/github/license/pinax-network/antelope-rust)
