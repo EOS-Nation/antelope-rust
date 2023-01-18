@@ -20,7 +20,7 @@ impl SymbolCode {
     }
 
     fn new(str: &str) -> SymbolCode {
-        SymbolCode::from(str.to_string())
+        SymbolCode::from(str)
     }
 
     fn length(&self) -> u32 {
@@ -112,6 +112,12 @@ impl From<String> for SymbolCode {
     }
 }
 
+impl From<&str> for SymbolCode {
+    fn from(str: &str) -> Self {
+        SymbolCode::from(str.to_string())
+    }
+}
+
 impl PartialEq for SymbolCode {
     fn eq(&self, other: &Self) -> bool {
         self.value == other.value
@@ -124,9 +130,28 @@ impl From<SymbolCode> for bool {
     }
 }
 
+impl AsRef<SymbolCode> for SymbolCode {
+    fn as_ref(&self) -> &SymbolCode {
+        &self
+    }
+}
+
+#[test]
+fn test_as_ref() {
+    assert_eq!(5459781, SymbolCode::from("EOS").as_ref().value);
+}
+
 #[test]
 fn test_length() {
     assert_eq!(3, SymbolCode::from(5459781).length());
+    assert_eq!(3, SymbolCode::from("EOS").length());
+    assert_eq!(1, SymbolCode::from("A").length());
+    assert_eq!(2, SymbolCode::from("AB").length());
+    assert_eq!(3, SymbolCode::from("ABC").length());
+    assert_eq!(4, SymbolCode::from("ABCD").length());
+    assert_eq!(5, SymbolCode::from("ABCDE").length());
+    assert_eq!(6, SymbolCode::from("ABCDEF").length());
+    assert_eq!(7, SymbolCode::from("ABCDEFG").length());
 }
 
 #[test]
@@ -212,6 +237,12 @@ fn test_to_string() {
         "ABCDEFG",
         SymbolCode::from("ABCDEFG".to_string()).to_string()
     );
+}
+
+
+#[test]
+fn test_to_str() {
+    assert_eq!("EOS", SymbolCode::from("EOS").to_string());
 }
 
 #[test]

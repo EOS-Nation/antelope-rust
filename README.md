@@ -19,6 +19,10 @@ Implements most commonly used Antelop (EOSIO) C++ Classes into Rust.
 
 ## Install
 
+```bash
+$ cargo add antelope
+```
+
 **Cargo.toml**
 
 ```toml
@@ -31,7 +35,15 @@ antelope = "0.0.1"
 ```rust
 use antelope::{SymbolCode};
 
-let symcode = SymbolCode::from("EOS".to_string());
-let raw: u64 = symcode.raw();
-// => 5459781
+SymbolCode::new("FOO").raw();
+// => 5197638
+
+SymbolCode::from(5197638).to_string();
+// => "FOO"
+
+SymbolCode::new("FOO") != SymbolCode::new("BAR")
+// => true
+
+SymbolCode::new("FOO") == SymbolCode::new("BAR")
+// => false
 ```
