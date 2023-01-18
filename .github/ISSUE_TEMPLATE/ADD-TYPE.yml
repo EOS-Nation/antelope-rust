@@ -19,8 +19,9 @@ body:
       label: "Custom Types"
       description: Please enter the list of custom types to be supported
       value: |
-        - [ ] suffix
-        - [ ] prefix
+        - [ ] length
+        - [ ] is_valid
+        - [ ] raw
       render: markdown
     validations:
       required: true
@@ -31,11 +32,8 @@ body:
       label: "Standard Types"
       description: Please enter the list of standard types to be supported
       value: |
-        - [ ] `raw`
         - [ ] `origin`
         - [ ] `new`
-        - [ ] `length`
-        - [ ] `is_valid`
         - [ ] `not`
         - [ ] `as_ref`
         - `AsBool`
