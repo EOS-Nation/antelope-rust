@@ -4,7 +4,7 @@
 use std::clone::Clone;
 use std::cmp::PartialEq;
 use std::convert::From;
-use std::fmt::{Result, Formatter, Display};
+use std::fmt::{Display, Formatter, Result};
 use std::ops::Not;
 
 #[derive(Debug)]
