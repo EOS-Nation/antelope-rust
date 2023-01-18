@@ -1,4 +1,5 @@
 #![allow(dead_code, unused)]
+use std::fmt;
 use std::cmp::Eq;
 use std::cmp::PartialEq;
 use std::convert::From;
@@ -37,12 +38,12 @@ impl SymbolCode {
         let mut sym: u64 = self.value;
         let mut i = 0;
         while i < 7 {
-            let c = (sym as u8 & 0xFF) as char;
-            if (!('A' <= c && c <= 'Z')) {
+            let c = sym as u8 as char;
+            if (!('A'..='Z').contains(&c)) {
                 return false;
             }
             sym >>= 8;
-            if (!(sym as u8 & 0xFF > 0)) {
+            if sym == 0 {
                 while i < 7 {
                     sym >>= 8;
                     if (sym & 0xFF) != 0 {
@@ -55,26 +56,26 @@ impl SymbolCode {
         }
         true
     }
+}
 
-    fn to_string(&self) -> String {
+impl fmt::Display for SymbolCode {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let mask = 0x00000000000000FF;
         if self.value == 0 {
-            return "".to_string();
+            return fmt::Result::Ok(());
         }
-
         let mut begin = "".to_string();
         let mut v = self.value;
         let mut i = 0;
+
         while (i < 7) {
-            if (v == 0) {
-                return begin;
-            }
+            if (v == 0) { break; }
             let c = (v & mask) as u8 as char;
             begin.push(c);
             v >>= 8;
             i += 1;
         }
-        begin
+        f.write_str(begin.as_str())
     }
 }
 
@@ -143,6 +144,16 @@ fn test_partial_eq() {
 fn test_new() {
     assert_eq!("EOS", SymbolCode::new("EOS").to_string());
     assert_eq!(5459781, SymbolCode::new("EOS").raw());
+}
+
+#[test]
+fn test_fmt() {
+    assert_eq!("EOS", format!("{}", SymbolCode::new("EOS")));
+}
+
+#[test]
+fn test_println() {
+    println!("{}", SymbolCode::new("EOS"));
 }
 
 #[test]
