@@ -2,10 +2,9 @@
 
 #![allow(dead_code, unused)]
 use std::clone::Clone;
-use std::cmp::Eq;
 use std::cmp::PartialEq;
 use std::convert::From;
-use std::fmt;
+use std::fmt::{Result, Formatter, Display};
 use std::ops::Not;
 
 #[derive(Debug)]
@@ -61,18 +60,18 @@ impl SymbolCode {
     }
 }
 
-impl fmt::Display for SymbolCode {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl Display for SymbolCode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         let mask = 0x00000000000000FF;
         if self.value == 0 {
-            return fmt::Result::Ok(());
+            return Result::Ok(());
         }
         let mut begin = "".to_string();
         let mut v = self.value;
         let mut i = 0;
 
-        while (i < 7) {
-            if (v == 0) {
+        while i < 7 {
+            if v == 0 {
                 break;
             }
             let c = (v & mask) as u8 as char;
