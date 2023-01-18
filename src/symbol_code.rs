@@ -1,4 +1,7 @@
+// Reference: https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio/symbol.hpp
+
 #![allow(dead_code, unused)]
+use std::clone::Clone;
 use std::cmp::Eq;
 use std::cmp::PartialEq;
 use std::convert::From;
@@ -89,6 +92,12 @@ impl Not for SymbolCode {
     }
 }
 
+impl Clone for SymbolCode {
+    fn clone(&self) -> Self {
+        SymbolCode { value: self.value }
+    }
+}
+
 impl From<u64> for SymbolCode {
     fn from(value: u64) -> Self {
         SymbolCode { value }
@@ -130,21 +139,40 @@ impl From<SymbolCode> for bool {
     }
 }
 
+trait AsBool {
+    fn as_bool(&self) -> bool;
+}
+
+impl AsBool for SymbolCode {
+    fn as_bool(&self) -> bool {
+        self.is_valid()
+    }
+}
+
 impl AsRef<SymbolCode> for SymbolCode {
     fn as_ref(&self) -> &SymbolCode {
-        &self
+        self
     }
 }
 
 #[test]
 fn test_as_ref() {
-    assert_eq!(5459781, SymbolCode::from("EOS").as_ref().value);
+    assert_eq!(5197638, SymbolCode::from("FOO").as_ref().value);
+    assert_eq!(5390658, SymbolCode::from("BAR").as_ref().value);
+}
+
+#[test]
+fn test_clone() {
+    SymbolCode::new("FOO").clone();
+}
+
+#[test]
+fn test_some_unwrap() {
+    let symcode = Some(SymbolCode::new("FOO"));
 }
 
 #[test]
 fn test_length() {
-    assert_eq!(3, SymbolCode::from(5459781).length());
-    assert_eq!(3, SymbolCode::from("EOS").length());
     assert_eq!(1, SymbolCode::from("A").length());
     assert_eq!(2, SymbolCode::from("AB").length());
     assert_eq!(3, SymbolCode::from("ABC").length());
@@ -157,30 +185,30 @@ fn test_length() {
 #[test]
 fn test_not() {
     assert_eq!(true, SymbolCode::from(0).not());
-    assert_eq!(false, SymbolCode::from(5459781).not());
+    assert_eq!(false, SymbolCode::from(5197638).not());
 }
 
 #[test]
 fn test_partial_eq() {
-    assert_eq!(true, SymbolCode::from(5459781) == SymbolCode::from(5459781));
-    assert_eq!(true, SymbolCode::from(0) != SymbolCode::from(5459781));
-    assert_eq!(false, SymbolCode::from(0) == SymbolCode::from(5459781));
+    assert_eq!(true, SymbolCode::from(5197638) == SymbolCode::from(5197638));
+    assert_eq!(true, SymbolCode::from(0) != SymbolCode::from(5197638));
+    assert_eq!(false, SymbolCode::from(0) == SymbolCode::from(5197638));
 }
 
 #[test]
 fn test_new() {
-    assert_eq!("EOS", SymbolCode::new("EOS").to_string());
-    assert_eq!(5459781, SymbolCode::new("EOS").raw());
+    assert_eq!("FOO", SymbolCode::new("FOO").to_string());
+    assert_eq!(5197638, SymbolCode::new("FOO").raw());
 }
 
 #[test]
 fn test_fmt() {
-    assert_eq!("EOS", format!("{}", SymbolCode::new("EOS")));
+    assert_eq!("FOO", format!("{}", SymbolCode::new("FOO")));
 }
 
 #[test]
 fn test_println() {
-    println!("{}", SymbolCode::new("EOS"));
+    println!("{}", SymbolCode::new("FOO"));
 }
 
 #[test]
@@ -189,11 +217,14 @@ fn test_origin() {
 }
 
 #[test]
+fn test_as_bool() {
+    assert_eq!(true, SymbolCode::from(5197638).as_bool());
+}
+
+#[test]
 fn test_into_bool() {
-    let true_boolean: bool = SymbolCode::from(5459781).into();
-    let false_boolean: bool = SymbolCode::from(0).into();
-    assert_eq!(true, true_boolean);
-    assert_eq!(false, false_boolean);
+    assert_eq!(true, SymbolCode::from(5197638).into());
+    assert_eq!(false, SymbolCode::from(0).into());
     if SymbolCode::from(0).into() {
         panic!("SymbolCode::from( 0 ) should be false");
     }
@@ -209,8 +240,8 @@ fn test_if_bool() {
 #[test]
 #[should_panic]
 fn test_if_bool_panic() {
-    if SymbolCode::from(5459781).into() {
-        panic!("SymbolCode::from( 5459781 ) should be true");
+    if SymbolCode::from(5197638).into() {
+        panic!("SymbolCode::from( 5197638 ) should be true");
     }
 }
 
@@ -219,30 +250,29 @@ fn test_from() {
     assert_eq!(0, SymbolCode::from(0).value);
     assert_eq!(0, SymbolCode::from(0).raw());
     assert_eq!(0, SymbolCode::from("".to_string()).raw());
-    assert_eq!(5459781, SymbolCode::from("EOS".to_string()).value);
-    assert_eq!(5459781, SymbolCode::from(5459781).raw());
+    assert_eq!(5197638, SymbolCode::from("FOO".to_string()).value);
+    assert_eq!(5197638, SymbolCode::from(5197638).raw());
 }
 
 #[test]
 fn test_is_valid() {
     assert_eq!(false, SymbolCode::from(0).is_valid());
-    assert_eq!(true, SymbolCode::from("EOS".to_string()).is_valid());
+    assert_eq!(true, SymbolCode::from("FOO".to_string()).is_valid());
 }
 
 #[test]
 fn test_to_string() {
-    assert_eq!("EOS", SymbolCode::from(5459781).to_string());
-    assert_eq!("EOS", SymbolCode::from("EOS".to_string()).to_string());
+    assert_eq!("FOO", SymbolCode::from(5197638).to_string());
+    assert_eq!("FOO", SymbolCode::from("FOO".to_string()).to_string());
     assert_eq!(
         "ABCDEFG",
         SymbolCode::from("ABCDEFG".to_string()).to_string()
     );
 }
 
-
 #[test]
 fn test_to_str() {
-    assert_eq!("EOS", SymbolCode::from("EOS").to_string());
+    assert_eq!("FOO", SymbolCode::from("FOO").to_string());
 }
 
 #[test]
