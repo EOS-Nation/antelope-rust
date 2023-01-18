@@ -1,14 +1,12 @@
-# `Antelope` Rust library
+# `Antelope` Standard Library for `Rust`
 
-[![Build Status](https://github.com/EOS-Nation/antelope-rust/actions/workflows/test.yml/badge.svg)](https://github.com/EOS-Nation/antelope-rust/actions/workflows/test.yml)
-![License](https://img.shields.io/github/license/EOS-Nation/antelope-rust)
+[![Build Status](https://github.com/pinax-network/antelope-rust/actions/workflows/test.yml/badge.svg)](https://github.com/pinax-network/antelope-rust/actions/workflows/test.yml)
+![License](https://img.shields.io/github/license/pinax-network/antelope-rust)
 ![Crates.io](https://img.shields.io/crates/v/antelope)
 
-> Antelope common library.
+Implements most commonly used [Antelope C++ Classes](https://github.com/AntelopeIO/cdt/tree/main/libraries/eosiolib/core/eosio) into Rust.
 
-Implements most commonly used Antelop (EOSIO) C++ Classes into Rust.
-
-## Support for
+## Planned support for
 
 - [ ] asset
 - [ ] symbol

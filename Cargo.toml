@@ -1,12 +1,12 @@
 [package]
 name = "antelope"
-version = "0.0.1"
-authors = ["Denis Carriere <denis@eosnation.io>"]
-description = "Antelope common library"
-homepage = "https://github.com/EOS-Nation/antelope-rust"
-repository = "https://github.com/EOS-Nation/antelope-rust"
+version = "0.0.2"
+authors = ["Denis Carriere <denis@pinax.network>"]
+description = "Antelope Standard Library"
+homepage = "https://github.com/pinax-network/antelope-rust"
+repository = "https://github.com/pinax-network/antelope-rust"
 categories = [ "api-bindings", "cryptography::cryptocurrencies", "data-structures", "parsing", "value-formatting"]
-keywords = ["antelope", "eos", "eosio", "blockchain", "crypto"]
+keywords = ["antelope", "blockchain", "crypto"]
 readme = "README.md"
 license = "MIT OR Apache-2.0"
 edition = "2021"
