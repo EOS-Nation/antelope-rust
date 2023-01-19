@@ -9,17 +9,76 @@ use std::ops::Not;
 
 use crate::check::check;
 
-#[derive(Debug, Eq)]
-struct SymbolCode {
-    value: u64,
+/// The `SymbolCode` struct represents a symbol code
+///
+/// A symbol code is a 64-bit unsigned integer that represents a symbol
+///
+/// The symbol code is used to represent a currency or asset
+///
+/// # Examples
+///
+/// ```
+/// use antelope::symbol_code::SymbolCode;
+///
+/// let symcode = SymbolCode::new("FOO");
+/// assert_eq!(5197638, symcode.raw());
+/// assert_eq!(3, symcode.length());
+/// assert_eq!(true, symcode.is_valid());
+/// assert_eq!("FOO", symcode.to_string());
+/// ```
+#[derive(Eq)]
+pub struct SymbolCode {
+    /// The raw value of the symbol code
+    ///
+    /// The raw value is the underlying representation of the symbol code
+    ///
+    /// The raw value is an unsigned 64-bit integer
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use antelope::symbol_code::SymbolCode;
+    ///
+    /// let symcode = SymbolCode::new("FOO");
+    /// assert_eq!(5197638, symcode.value);
+    /// ```
+    pub value: u64,
 }
 
 impl SymbolCode {
-    fn raw(&self) -> u64 {
+    /// Returns the raw value of the symbol code
+    ///
+    /// The raw value is the underlying representation of the symbol code
+    ///
+    /// The raw value is an unsigned 64-bit integer
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use antelope::symbol_code::SymbolCode;
+    ///
+    /// let symcode = SymbolCode::new("FOO");
+    /// assert_eq!(5197638, symcode.raw());
+    /// ```
+    pub fn raw(&self) -> u64 {
         self.value
     }
 
-    fn length(&self) -> u32 {
+    /// Returns the length of the symbol code
+    ///
+    /// The length is the number of characters in the symbol code
+    ///
+    /// The length is at most 7
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use antelope::symbol_code::SymbolCode;
+    ///
+    /// let len = SymbolCode::new("FOO").length();
+    /// assert_eq!(3, len);
+    /// ```
+    pub fn length(&self) -> u32 {
         let mut sym: u64 = self.value;
         let mut len: u32 = 0;
 
@@ -30,7 +89,19 @@ impl SymbolCode {
         len
     }
 
-    fn is_valid(&self) -> bool {
+    /// Returns true if the symbol code is valid
+    ///
+    /// A symbol code is valid if it is not empty and contains only uppercase letters and has a length of at most 7
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use antelope::symbol_code::SymbolCode;
+    ///
+    /// let symcode = SymbolCode::new("FOO");
+    /// assert_eq!(true, symcode.is_valid());
+    /// ```
+    pub fn is_valid(&self) -> bool {
         let mut sym: u64 = self.value;
         let mut i = 0;
         while i < 7 {
@@ -53,7 +124,20 @@ impl SymbolCode {
         true
     }
 
-    fn new(str: &str) -> SymbolCode {
+    /// Returns a new symbol code
+    ///
+    /// The new symbol code is constructed from the given string
+    ///
+    /// The string must be at most 7 characters long and contain only uppercase letters
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use antelope::symbol_code::SymbolCode;
+    ///
+    /// let symcode = SymbolCode::new("FOO");
+    /// assert_eq!("FOO", symcode.to_string());
+    pub fn new(str: &str) -> SymbolCode {
         SymbolCode::from(str)
     }
 }

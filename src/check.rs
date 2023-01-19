@@ -1,3 +1,15 @@
+
+/// Checks that a condition is true, and panics if it is not.
+///
+/// This is a convenience function for writing tests.
+///
+/// # Examples
+/// ```
+/// use antelope::check;
+/// 
+/// check!(true, "This should not panic");
+/// check!(false, "This should panic");
+/// ```
 pub fn check(predicate: bool, message: &str) {
     if !predicate {
         panic!("{}", message)
