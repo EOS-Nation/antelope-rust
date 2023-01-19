@@ -1,5 +1,4 @@
-#![allow(dead_code, unused)]
-use std::cmp::{Ord, Ordering, PartialEq, PartialOrd};
+use std::cmp::{Ord, PartialEq, PartialOrd};
 use std::convert::From;
 use std::fmt::{Display, Formatter, Result};
 
@@ -107,7 +106,7 @@ impl SymbolCode {
         let mut i = 0;
         while i < 7 {
             let c = sym as u8 as char;
-            if (!('A'..='Z').contains(&c)) {
+            if !('A'..='Z').contains(&c) {
                 return false;
             }
             sym >>= 8;
@@ -209,7 +208,7 @@ mod symbol_code_tests {
 
     #[test]
     fn test_clone() {
-        SymbolCode::from("FOO").clone();
+        assert_eq!(5197638, SymbolCode::from("FOO").clone().value);
     }
 
     #[test]
@@ -284,18 +283,21 @@ mod symbol_code_tests {
     }
 
     #[test]
+    #[allow(unused)]
     #[should_panic(expected = "string is too long to be a valid symbol_code")]
     fn test_from_string_long_panic_1() {
         SymbolCode::from("ABCDEFGH");
     }
 
     #[test]
+    #[allow(unused)]
     #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
     fn test_from_string_letters_panic_1() {
         SymbolCode::from("abc");
     }
 
     #[test]
+    #[allow(unused)]
     #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
     fn test_from_string_letters_panic_2() {
         SymbolCode::from("123");
