@@ -25,15 +25,21 @@ body:
     validations:
       required: true
 
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search to see if an issue already exists for the bug you encountered.
+      options:
+      - label: `new`
+      - label: `as_ref`
+
   - type: textarea
     id: standard
     attributes:
       label: "Standard Rust Types"
       description: Please enter the list of standard types to be supported
       value: |
-        - [ ] `origin`
         - [ ] `new`
-        - [ ] `not`
         - [ ] `as_ref`
         - `AsBool`
           - [ ] `as_bool`
@@ -41,8 +47,6 @@ body:
           - [ ] `Clone`
         - `std::fmt`
           - [ ] `{Result, Formatter, Display}`
-        - `std::cmp`
-          - [ ] `PartialEq`
         - `std::convert::From`
           - [ ] `From<u64>`
           - [ ] `From<String>`

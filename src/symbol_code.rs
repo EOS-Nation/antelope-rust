@@ -17,14 +17,6 @@ impl SymbolCode {
         self.value
     }
 
-    fn origin() -> SymbolCode {
-        SymbolCode { value: 0 }
-    }
-
-    fn new(str: &str) -> SymbolCode {
-        SymbolCode::from(str)
-    }
-
     fn length(&self) -> u32 {
         let mut sym: u64 = self.value;
         let mut len: u32 = 0;
@@ -57,6 +49,10 @@ impl SymbolCode {
             i += 1;
         }
         true
+    }
+
+    fn new(str: &str) -> SymbolCode {
+        SymbolCode::from(str)
     }
 }
 
@@ -208,11 +204,6 @@ fn test_fmt() {
 #[test]
 fn test_println() {
     println!("{}", SymbolCode::new("FOO"));
-}
-
-#[test]
-fn test_origin() {
-    assert_eq!(0, SymbolCode::origin().value);
 }
 
 #[test]
