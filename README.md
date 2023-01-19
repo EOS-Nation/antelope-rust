@@ -21,27 +21,14 @@ Implements most commonly used [Antelope C++ Classes](https://github.com/Antelope
 $ cargo add antelope
 ```
 
-**Cargo.toml**
-
-```toml
-[dependencies]
-antelope = "0.0.1"
-```
-
 ## Quickstart
 
 ```rust
-use antelope::{SymbolCode};
+use antelope::symbol_code::SymbolCode;
 
-SymbolCode::new("FOO").raw();
-// => 5197638
-
-SymbolCode::from(5197638).to_string();
-// => "FOO"
-
-SymbolCode::new("FOO") != SymbolCode::new("BAR")
-// => true
-
-SymbolCode::new("FOO") == SymbolCode::new("BAR")
-// => false
+let symcode = SymbolCode::new("FOO");
+assert_eq!(5197638, symcode.raw());
+assert_eq!(3, symcode.length());
+assert_eq!(true, symcode.is_valid());
+assert_eq!("FOO", symcode.to_string());
 ```
