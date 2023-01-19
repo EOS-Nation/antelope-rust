@@ -14,6 +14,7 @@ Implements most commonly used [Antelope C++ Classes](https://github.com/Antelope
 - [ ] name
 - [ ] extended_asset
 - [ ] extended_symbol
+- [x] check
 
 ## Install
 
