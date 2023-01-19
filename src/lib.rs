@@ -1,2 +1,2 @@
-pub mod symbol_code;
 pub mod check;
+pub mod symbol_code;

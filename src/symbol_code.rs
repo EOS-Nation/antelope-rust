@@ -2,7 +2,7 @@
 
 #![allow(dead_code, unused)]
 use std::clone::Clone;
-use std::cmp::{PartialEq, PartialOrd, Ord, Ordering};
+use std::cmp::{Ord, Ordering, PartialEq, PartialOrd};
 use std::convert::From;
 use std::fmt::{Display, Formatter, Result};
 use std::ops::Not;
@@ -104,9 +104,15 @@ impl From<u64> for SymbolCode {
 impl From<String> for SymbolCode {
     fn from(str: String) -> Self {
         let mut value: u64 = 0;
-        check(str.len() <= 7, "string is too long to be a valid symbol_code");
+        check(
+            str.len() <= 7,
+            "string is too long to be a valid symbol_code",
+        );
         for c in str.chars().rev() {
-            check(('A'..='Z').contains(&c), "only uppercase letters allowed in symbol_code string");
+            check(
+                ('A'..='Z').contains(&c),
+                "only uppercase letters allowed in symbol_code string",
+            );
             value <<= 8;
             value |= c as u64;
         }
