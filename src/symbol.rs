@@ -24,7 +24,7 @@ use crate::check;
 /// assert_eq!(true, symcode.is_valid());
 /// assert_eq!("FOO", symcode.to_string());
 /// ```
-#[derive(Eq, Copy, Clone, Debug, PartialEq, PartialOrd, Ord)]
+#[derive(Eq, Copy, Clone, Debug, PartialEq, PartialOrd, Ord, Default)]
 pub struct SymbolCode {
     /// The raw value of the symbol code
     ///
@@ -136,11 +136,11 @@ impl SymbolCode {
     /// ```
     /// use antelope::SymbolCode;
     ///
-    /// let symcode = SymbolCode::from("FOO");
-    /// assert_eq!("FOO", symcode.to_string());
+    /// let symcode = SymbolCode::new();
+    /// assert_eq!("", symcode.to_string());
     #[must_use]
-    pub fn new() -> SymbolCode {
-        SymbolCode { value: 0 }
+    pub fn new() -> Self {
+        Self { value: 0 }
     }
 }
 
