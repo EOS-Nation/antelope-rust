@@ -14,7 +14,5 @@
 /// check(false, "This should panic");
 /// ```
 pub fn check(predicate: bool, message: &str) {
-    if !predicate {
-        panic!("{}", message)
-    }
+    assert!(predicate, "{}", message)
 }
