@@ -245,6 +245,7 @@ mod symbol_code_tests {
     #[test]
     fn test_fmt() {
         assert_eq!("FOO", format!("{}", SymbolCode::from("FOO")));
+        assert_eq!("", format!("{}", SymbolCode::new()));
     }
 
     #[test]
