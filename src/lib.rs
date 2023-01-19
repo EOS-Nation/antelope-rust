@@ -28,3 +28,7 @@ pub use self::check::check;
 /// Modules for Symbols related types.
 pub mod symbol;
 pub use self::symbol::SymbolCode;
+
+/// Modules for Names related types.
+pub mod name;
+pub use self::name::Name;
