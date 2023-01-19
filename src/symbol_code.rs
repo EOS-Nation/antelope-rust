@@ -2,12 +2,12 @@
 
 #![allow(dead_code, unused)]
 use std::clone::Clone;
-use std::cmp::{PartialEq, PartialOrd};
+use std::cmp::{PartialEq, PartialOrd, Ord, Ordering};
 use std::convert::From;
 use std::fmt::{Display, Formatter, Result};
 use std::ops::Not;
 
-#[derive(Debug)]
+#[derive(Debug, Eq)]
 struct SymbolCode {
     value: u64,
 }
@@ -83,7 +83,7 @@ impl Not for SymbolCode {
     type Output = bool;
 
     fn not(self) -> bool {
-        !self.is_valid()
+        self.value == 0
     }
 }
 
@@ -125,6 +125,18 @@ impl From<&str> for SymbolCode {
 impl PartialEq for SymbolCode {
     fn eq(&self, other: &Self) -> bool {
         self.value == other.value
+    }
+}
+
+impl PartialOrd for SymbolCode {
+    fn partial_cmp(&self, other: &SymbolCode) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for SymbolCode {
+    fn cmp(&self, other: &SymbolCode) -> Ordering {
+        self.value.cmp(&other.value)
     }
 }
 
@@ -188,6 +200,12 @@ fn test_partial_eq() {
     assert_eq!(true, SymbolCode::from(5197638) == SymbolCode::from(5197638));
     assert_eq!(true, SymbolCode::from(0) != SymbolCode::from(5197638));
     assert_eq!(false, SymbolCode::from(0) == SymbolCode::from(5197638));
+}
+
+#[test]
+fn test_partial_cmp() {
+    assert_eq!(true, SymbolCode::from(0) < SymbolCode::from(1));
+    assert_eq!(false, SymbolCode::from(3) < SymbolCode::from(2));
 }
 
 #[test]

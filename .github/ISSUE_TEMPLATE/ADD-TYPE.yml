@@ -58,7 +58,7 @@ body:
           - [ ] expr == expr
         - `Not`
           - [ ] expr!
-        - `PartialOrd`
+        - `PartialOrd` (`partial_cmp` & `cmp`)
           - [ ] expr < expr
           - [ ] expr > expr
           - [ ] expr <= expr
