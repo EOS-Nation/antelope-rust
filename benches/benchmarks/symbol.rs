@@ -1,4 +1,4 @@
-use antelope::symbol::SymbolCode;
+use antelope::SymbolCode;
 use criterion::{black_box, criterion_group, Criterion};
 
 pub fn criterion_benchmark(c: &mut Criterion) {
