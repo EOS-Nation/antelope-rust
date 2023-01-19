@@ -1,8 +1,9 @@
 # [`Antelope`](https://antelope.io/) Standard Library for [`Rust`](https://www.rust-lang.org/)
 
-[![Build Status](https://github.com/pinax-network/antelope.rs/actions/workflows/test.yml/badge.svg)](https://github.com/pinax-network/antelope.rs/actions/workflows/test.yml)
-![License](https://img.shields.io/github/license/pinax-network/antelope.rs)
-![Crates.io](https://img.shields.io/crates/v/antelope)
+[<img alt="github" src="https://img.shields.io/badge/Github-antelope.rs-8da0cb?style=for-the-badge&logo=github" height="20">](https://github.com/pinax-network/antelope.rs)
+[<img alt="crates.io" src="https://img.shields.io/crates/v/antelope.svg?style=for-the-badge&color=fc8d62&logo=rust" height="20">](https://crates.io/crates/antelope)
+[<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-antelope-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="20">](https://docs.rs/antelope)
+[<img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/pinax-network/antelope.rs/ci.yml?branch=main&style=for-the-badge" height="20">](https://github.com/pinax-network/antelope.rs/actions?query=branch%3Amain)
 
 Implements most commonly used [Antelope C++ Classes](https://github.com/AntelopeIO/cdt/tree/main/libraries/eosiolib/core/eosio) into Rust.
 
