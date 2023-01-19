@@ -1,7 +1,4 @@
-// Reference: https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio/symbol.hpp
-
 #![allow(dead_code, unused)]
-use std::clone::Clone;
 use std::cmp::{Ord, Ordering, PartialEq, PartialOrd};
 use std::convert::From;
 use std::fmt::{Display, Formatter, Result};
@@ -10,6 +7,8 @@ use std::ops::Not;
 use crate::check::check;
 
 /// The `SymbolCode` struct represents a symbol code
+/// 
+/// Reference: <https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio/symbol.hpp>
 ///
 /// A symbol code is a 64-bit unsigned integer that represents a symbol
 ///
@@ -26,7 +25,7 @@ use crate::check::check;
 /// assert_eq!(true, symcode.is_valid());
 /// assert_eq!("FOO", symcode.to_string());
 /// ```
-#[derive(Eq, Debug)]
+#[derive(Eq, Copy, Clone, Debug)]
 pub struct SymbolCode {
     /// The raw value of the symbol code
     ///
@@ -168,16 +167,28 @@ impl Display for SymbolCode {
 impl Not for SymbolCode {
     type Output = bool;
 
+    /// Returns true if the symbol code is empty
+    /// 
+    /// A symbol code is empty if it is equal to 0
+    /// 
+    /// # Examples
+    /// 
+    /// ```
+    /// use antelope::symbol_code::SymbolCode;
+    /// 
+    /// let symcode = SymbolCode::new("FOO");
+    /// assert_eq!(false, !symcode);
+    /// ```
     fn not(self) -> bool {
         self.value == 0
     }
 }
 
-impl Clone for SymbolCode {
-    fn clone(&self) -> Self {
-        SymbolCode { value: self.value }
-    }
-}
+// impl Clone for SymbolCode {
+//     fn clone(&self) -> Self {
+//         SymbolCode { value: self.value }
+//     }
+// }
 
 impl From<u64> for SymbolCode {
     fn from(value: u64) -> Self {
@@ -280,7 +291,9 @@ fn test_length() {
 #[test]
 fn test_not() {
     assert_eq!(true, SymbolCode::from(0).not());
+    assert_eq!(true, !SymbolCode::from(0));
     assert_eq!(false, SymbolCode::from(5197638).not());
+    assert_eq!(false, !SymbolCode::from(5197638));
 }
 
 #[test]

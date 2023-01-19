@@ -1,10 +1,10 @@
 [package]
 name = "antelope"
-version = "0.0.6"
-authors = ["Denis Carriere <denis@pinax.network>"]
+version = "0.0.7"
+authors = ["Denis 🚀 <denis@pinax.network>", "Yaro <yaro@pinax.network>"]
 description = "Antelope Standard Library"
-homepage = "https://github.com/pinax-network/antelope-rust"
-repository = "https://github.com/pinax-network/antelope-rust"
+homepage = "https://github.com/pinax-network/antelope.rs"
+repository = "https://github.com/pinax-network/antelope.rs"
 categories = [ "api-bindings", "cryptography::cryptocurrencies", "data-structures", "parsing", "value-formatting"]
 keywords = ["antelope", "blockchain", "crypto"]
 readme = "README.md"
@@ -14,7 +14,15 @@ edition = "2021"
 [badges]
 maintenance = { status = "actively-developed" }
 
+[dev-dependencies]
+criterion = "0.4"
+
+[[bench]]
+name = "bench_main"
+harness = false
+
 [package.metadata.docs.rs]
-all-features = true
 targets = ["x86_64-unknown-linux-gnu"]
-rustdoc-args = ["--cfg", "doc_cfg"]
+
+[package.metadata.playground]
+default-features = true

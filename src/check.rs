@@ -13,6 +13,7 @@
 /// #[test]
 /// check(false, "This should panic");
 /// ```
+#[inline]
 pub fn check(predicate: bool, message: &str) {
     assert!(predicate, "{}", message)
 }

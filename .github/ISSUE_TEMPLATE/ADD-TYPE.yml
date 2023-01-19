@@ -35,6 +35,8 @@ body:
         - [ ] `as_ref`
         - `AsBool`
           - [ ] `as_bool`
+        - `std::marker::Copy`
+          - [ ] `Copy`
         - `std::clone`
           - [ ] `Clone`
         - `std::fmt`
