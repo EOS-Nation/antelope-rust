@@ -149,6 +149,7 @@ impl AsRef<Name> for Name {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use proptest::prelude::*;
 
     #[test]
     fn test_name_new() {
@@ -174,6 +175,18 @@ mod tests {
     fn test_name_from_str_invalid_char() {
         let _name = Name::from("pinax!");
     }
+
+    // #[test]
+    // #[should_panic(expected = "name contains invalid character")]
+    // fn test_name_from_str_invalid_char_dot() {
+    //     let _name = Name::from("pinax.");
+    // }
+
+    // #[test]
+    // #[should_panic(expected = "name contains invalid character")]
+    // fn test_name_from_str_invalid_char_dot_2() {
+    //     let _name = Name::from(".pinax");
+    // }
 
     #[test]
     #[should_panic(expected = "name is too long")]
@@ -229,8 +242,21 @@ mod tests {
 
     #[test]
     fn test_name_as_ref_str() {
-        let name = Name::from("pinax");
+        let name = Name::from("pi.nax");
         let name_ref = name.as_ref();
-        assert_eq!(name_ref.to_string(), "pinax");
+        assert_eq!(name_ref.to_string(), "pi.nax");
+    }
+
+    proptest! {
+        #[test]
+        fn random_names(input in "[[1-5][a-z]]{0,12}[a-j]{0,1}") {
+            let name = Name::from(input.as_str());
+            prop_assert_eq!(name.to_string(), input);
+        }
+        #[test]
+        fn random_names_with_dot(input in "[[1-5][a-z]]{1,5}[.]{0,1}[1-5][a-z]{1,5}") {
+            let name = Name::from(input.as_str());
+            prop_assert_eq!(name.to_string(), input);
+        }
     }
 }

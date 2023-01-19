@@ -200,6 +200,8 @@ impl AsRef<SymbolCode> for SymbolCode {
 #[cfg(test)]
 mod symbol_code_tests {
     use super::*;
+    use proptest::prelude::*;
+
     #[test]
     fn test_as_ref() {
         assert_eq!(5197638, SymbolCode::from("FOO").as_ref().value);
@@ -322,5 +324,13 @@ mod symbol_code_tests {
         let symbol_code = SymbolCode::from("ABCDEFG");
         let cloned_symbol_code = symbol_code.clone();
         assert_eq!(symbol_code, cloned_symbol_code);
+    }
+
+    proptest! {
+        #[test]
+        fn random_sym_codes(input in "[[A-Z]]{1,7}") {
+            let symcode = SymbolCode::from(input.as_str());
+            prop_assert_eq!(symcode.to_string(), input);
+        }
     }
 }
