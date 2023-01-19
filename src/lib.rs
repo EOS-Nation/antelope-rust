@@ -23,6 +23,8 @@
 
 /// Modules for Asserts related types.
 pub mod check;
+pub use self::check::check;
 
 /// Modules for Symbols related types.
 pub mod symbol;
+pub use self::symbol::SymbolCode;
