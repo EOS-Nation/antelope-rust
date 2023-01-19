@@ -26,7 +26,7 @@ use crate::check::check;
 /// assert_eq!(true, symcode.is_valid());
 /// assert_eq!("FOO", symcode.to_string());
 /// ```
-#[derive(Eq)]
+#[derive(Eq, Debug)]
 pub struct SymbolCode {
     /// The raw value of the symbol code
     ///
@@ -387,4 +387,27 @@ fn test_from_string_letters_panic_1() {
 #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
 fn test_from_string_letters_panic_2() {
     SymbolCode::from("123".to_string());
+}
+
+#[test]
+fn test_symbol_code_ord() {
+    let symbol_code1 = SymbolCode::new("ABCDEFG");
+    let symbol_code2 = SymbolCode::new("ABCDEFH");
+    let symbol_code3 = SymbolCode::new("ABCDEF");
+    assert_eq!(symbol_code1.cmp(&symbol_code2), Ordering::Less);
+    assert_eq!(
+        symbol_code1.partial_cmp(&symbol_code2),
+        Some(Ordering::Less)
+    );
+    assert_eq!(symbol_code1.cmp(&symbol_code3), Ordering::Greater);
+    assert!(symbol_code1 > symbol_code3);
+    assert!(symbol_code3 < symbol_code2);
+}
+
+#[test]
+fn test_symbol_code_clone() {
+    let symbol_code = SymbolCode::new("ABCDEFG");
+    let cloned_symbol_code = symbol_code.clone();
+    assert_eq!(symbol_code, cloned_symbol_code);
+    assert_eq!(symbol_code, cloned_symbol_code);
 }
