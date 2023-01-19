@@ -3,5 +3,5 @@ use criterion::criterion_main;
 mod benchmarks;
 
 criterion_main! {
-    benchmarks::symbol_code::symbol_code,
+    benchmarks::symbol::symbol_code,
 }

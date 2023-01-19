@@ -17,7 +17,7 @@ use crate::check::check;
 /// # Examples
 ///
 /// ```
-/// use antelope::symbol_code::SymbolCode;
+/// use antelope::symbol::SymbolCode;
 ///
 /// let symcode = SymbolCode::new("FOO");
 /// assert_eq!(5197638, symcode.raw());
@@ -36,7 +36,7 @@ pub struct SymbolCode {
     /// # Examples
     ///
     /// ```
-    /// use antelope::symbol_code::SymbolCode;
+    /// use antelope::symbol::SymbolCode;
     ///
     /// let symcode = SymbolCode::new("FOO");
     /// assert_eq!(5197638, symcode.value);
@@ -54,7 +54,7 @@ impl SymbolCode {
     /// # Examples
     ///
     /// ```
-    /// use antelope::symbol_code::SymbolCode;
+    /// use antelope::symbol::SymbolCode;
     ///
     /// let symcode = SymbolCode::new("FOO");
     /// assert_eq!(5197638, symcode.raw());
@@ -72,7 +72,7 @@ impl SymbolCode {
     /// # Examples
     ///
     /// ```
-    /// use antelope::symbol_code::SymbolCode;
+    /// use antelope::symbol::SymbolCode;
     ///
     /// let len = SymbolCode::new("FOO").length();
     /// assert_eq!(3, len);
@@ -95,7 +95,7 @@ impl SymbolCode {
     /// # Examples
     ///
     /// ```
-    /// use antelope::symbol_code::SymbolCode;
+    /// use antelope::symbol::SymbolCode;
     ///
     /// let symcode = SymbolCode::new("FOO");
     /// assert_eq!(true, symcode.is_valid());
@@ -132,7 +132,7 @@ impl SymbolCode {
     /// # Examples
     ///
     /// ```
-    /// use antelope::symbol_code::SymbolCode;
+    /// use antelope::symbol::SymbolCode;
     ///
     /// let symcode = SymbolCode::new("FOO");
     /// assert_eq!("FOO", symcode.to_string());
@@ -174,7 +174,7 @@ impl Not for SymbolCode {
     /// # Examples
     ///
     /// ```
-    /// use antelope::symbol_code::SymbolCode;
+    /// use antelope::symbol::SymbolCode;
     ///
     /// let symcode = SymbolCode::new("FOO");
     /// assert_eq!(false, !symcode);

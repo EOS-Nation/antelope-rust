@@ -1,6 +1,6 @@
 [package]
 name = "antelope"
-version = "0.0.8"
+version = "0.0.9"
 authors = ["Denis 🚀 <denis@pinax.network>", "Yaro <yaro@pinax.network>"]
 description = "Antelope Standard Library"
 homepage = "https://github.com/pinax-network/antelope.rs"
