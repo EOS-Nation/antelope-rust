@@ -198,7 +198,6 @@ impl AsRef<SymbolCode> for SymbolCode {
     }
 }
 
-
 #[cfg(test)]
 mod symbol_code_tests {
     use super::*;
