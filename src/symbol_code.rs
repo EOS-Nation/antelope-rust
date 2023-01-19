@@ -7,6 +7,8 @@ use std::convert::From;
 use std::fmt::{Display, Formatter, Result};
 use std::ops::Not;
 
+use crate::check::check;
+
 #[derive(Debug, Eq)]
 struct SymbolCode {
     value: u64,
@@ -102,13 +104,9 @@ impl From<u64> for SymbolCode {
 impl From<String> for SymbolCode {
     fn from(str: String) -> Self {
         let mut value: u64 = 0;
-        if str.len() > 7 {
-            panic!("string is too long to be a valid symbol_code")
-        }
+        check(str.len() <= 7, "string is too long to be a valid symbol_code");
         for c in str.chars().rev() {
-            if !('A'..='Z').contains(&c) {
-                panic!("only uppercase letters allowed in symbol_code string")
-            }
+            check(('A'..='Z').contains(&c), "only uppercase letters allowed in symbol_code string");
             value <<= 8;
             value |= c as u64;
         }
