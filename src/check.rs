@@ -5,10 +5,14 @@
 ///
 /// # Examples
 /// ```
-/// use antelope::check;
+/// use antelope::check::check;
 /// 
-/// check!(true, "This should not panic");
-/// check!(false, "This should panic");
+/// #[test]
+/// #[should_panic]
+/// check(true, "This should not panic");
+///
+/// #[test]
+/// check(false, "This should panic");
 /// ```
 pub fn check(predicate: bool, message: &str) {
     if !predicate {
