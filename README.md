@@ -31,9 +31,9 @@ $ cargo add antelope
 ## Quickstart
 
 ```rust
-use antelope::symbol_code::{SymbolCode};
+use antelope::{SymbolCode};
 
-let symcode = SymbolCode::new("FOO");
+let symcode = SymbolCode::from("FOO");
 assert_eq!(5197638, symcode.raw());
 assert_eq!(3, symcode.length());
 assert_eq!(true, symcode.is_valid());
