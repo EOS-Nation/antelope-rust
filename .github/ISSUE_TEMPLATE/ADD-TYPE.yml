@@ -10,7 +10,7 @@ body:
     attributes:
       label: "Reference URL"
       description: Please enter your GitHub URL to provide a code reference of type
-      placeholder: ex. https://github.com/USERNAME/REPO-NAME
+      placeholder: ex. https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio
     validations:
       required: true
   - type: textarea
