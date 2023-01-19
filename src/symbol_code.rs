@@ -7,7 +7,7 @@ use std::ops::Not;
 use crate::check::check;
 
 /// The `SymbolCode` struct represents a symbol code
-/// 
+///
 /// Reference: <https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio/symbol.hpp>
 ///
 /// A symbol code is a 64-bit unsigned integer that represents a symbol
@@ -168,14 +168,14 @@ impl Not for SymbolCode {
     type Output = bool;
 
     /// Returns true if the symbol code is empty
-    /// 
+    ///
     /// A symbol code is empty if it is equal to 0
-    /// 
+    ///
     /// # Examples
-    /// 
+    ///
     /// ```
     /// use antelope::symbol_code::SymbolCode;
-    /// 
+    ///
     /// let symcode = SymbolCode::new("FOO");
     /// assert_eq!(false, !symcode);
     /// ```
