@@ -7,7 +7,10 @@ pub fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("SymbolCode::From<&str>", |b| {
         b.iter(|| SymbolCode::from(black_box("FOO")))
     });
+
     c.bench_function("symcode.is_valid()", |b| b.iter(|| symcode.is_valid()));
+
+    c.bench_function("!symcode", |b| b.iter(|| !symcode));
 }
 
 criterion_group!(symbol_code, criterion_benchmark);
