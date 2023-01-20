@@ -7,6 +7,10 @@
 
 Implements most commonly used [Antelope C++ Classes](https://github.com/AntelopeIO/cdt/tree/main/libraries/eosiolib/core/eosio) into Rust.
 
+## 📖 Documentation
+
+### https://docs.rs/antelope
+
 ## Feature Roadmap
 
 - [ ] [`symbol`](https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio/symbol.hpp)

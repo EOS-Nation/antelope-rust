@@ -21,14 +21,14 @@
 //!     - [ ] [`time_point_sec`](https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio/time.hpp)
 //!     - [ ] [`block_timestamp`](https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio/time.hpp)
 
-/// Modules for Asserts related types.
+/// Modules for Asserts type.
 pub mod check;
 pub use self::check::check;
 
-/// Modules for Symbols related types.
-pub mod symbol;
-pub use self::symbol::SymbolCode;
+/// Modules for Symbol Code type.
+pub mod symbol_code;
+pub use self::symbol_code::SymbolCode;
 
-/// Modules for Names related types.
+/// Modules for Name type.
 pub mod name;
 pub use self::name::Name;

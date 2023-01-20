@@ -1,8 +1,8 @@
+use crate::check;
 use std::cmp::{Ord, PartialEq, PartialOrd};
 use std::convert::From;
 use std::fmt::{Display, Formatter, Result};
-
-use crate::check;
+use std::ops::Not;
 
 /// The `SymbolCode` struct represents a symbol code
 ///
@@ -197,10 +197,139 @@ impl AsRef<SymbolCode> for SymbolCode {
     }
 }
 
+impl Not for SymbolCode {
+    type Output = bool;
+
+    fn not(self) -> bool {
+        self.value == 0
+    }
+}
+
 #[cfg(test)]
 mod symbol_code_tests {
     use super::*;
     use proptest::prelude::*;
+
+    #[test]
+    fn test_cdt_1() {
+        //// constexpr symbol_code()
+        // constexpr uint64_t raw()const
+        assert_eq!(0, SymbolCode::new().raw());
+    }
+
+    #[test]
+    fn test_cdt_2() {
+        //// constexpr explicit symbol_code(uint64_t raw)
+        assert_eq!(0, SymbolCode::from(0).raw());
+        assert_eq!(1, SymbolCode::from(1).raw());
+        assert_eq!(u64::MAX, SymbolCode::from(u64::MAX).raw());
+    }
+
+    #[test]
+    fn test_cdt_3() {
+        //// constexpr explicit symbol_code(string_view str)
+        assert_eq!(65, SymbolCode::from("A").raw());
+        assert_eq!(90, SymbolCode::from("Z").raw());
+        assert_eq!(18367622009667905, SymbolCode::from("AAAAAAA").raw());
+        assert_eq!(25432092013386330, SymbolCode::from("ZZZZZZZ").raw());
+    }
+
+    #[test]
+    fn test_cdt_4() {
+        //// constexpr bool is_valid()const
+        assert_eq!(true, SymbolCode::from(65).is_valid()); // "A"
+        assert_eq!(true, SymbolCode::from(90).is_valid()); // "Z"
+        assert_eq!(true, SymbolCode::from(18367622009667905).is_valid()); // "AAAAAAA"
+        assert_eq!(true, SymbolCode::from(25432092013386330).is_valid()); // "ZZZZZZZ"
+
+        assert_eq!(false, SymbolCode::from(64).is_valid());
+        assert_eq!(false, SymbolCode::from(25432092013386331).is_valid());
+    }
+
+    #[test]
+    fn test_cdt_5() {
+        // constexpr uint32_t length()const
+        assert_eq!(0, SymbolCode::from("").length());
+        assert_eq!(1, SymbolCode::from("S").length());
+        assert_eq!(2, SymbolCode::from("SY").length());
+        assert_eq!(3, SymbolCode::from("SYM").length());
+        assert_eq!(4, SymbolCode::from("SYMB").length());
+        assert_eq!(5, SymbolCode::from("SYMBO").length());
+        assert_eq!(6, SymbolCode::from("SYMBOL").length());
+        assert_eq!(7, SymbolCode::from("SYMBOLL").length());
+    }
+
+    #[test]
+    fn test_cdt_6() {
+        // constexpr explicit operator bool()const
+        assert_eq!(false, !!SymbolCode::from(0));
+        assert_eq!(true, !!SymbolCode::from(1));
+        assert_eq!(!true, !!SymbolCode::from(0));
+        assert_eq!(!false, !!SymbolCode::from(1));
+
+        assert_eq!(false, !!SymbolCode::from(""));
+        assert_eq!(true, !!SymbolCode::from("SYMBOL"));
+        assert_eq!(!true, !!SymbolCode::from(""));
+        assert_eq!(!false, !!SymbolCode::from("SYMBOL"));
+    }
+
+    #[test]
+    fn test_cdt_7() {
+        // string to_string()const
+        assert_eq!("A", SymbolCode::from("A").to_string());
+        assert_eq!("Z", SymbolCode::from("Z").to_string());
+        assert_eq!("AAAAAAA", SymbolCode::from("AAAAAAA").to_string());
+        assert_eq!("ZZZZZZZ", SymbolCode::from("ZZZZZZZ").to_string());
+    }
+
+    #[test]
+    fn test_cdt_8() {
+        // friend bool operator==(const symbol_code&, const symbol_code&)
+        assert_eq!(true, SymbolCode::from("A") == SymbolCode::from("A"));
+        assert_eq!(true, SymbolCode::from("Z") == SymbolCode::from("Z"));
+        assert_eq!(
+            true,
+            SymbolCode::from("AAAAAAA") == SymbolCode::from("AAAAAAA")
+        );
+        assert_eq!(
+            true,
+            SymbolCode::from("ZZZZZZZ") == SymbolCode::from("ZZZZZZZ")
+        );
+    }
+
+    #[test]
+    fn test_cdt_9() {
+        // friend bool operator!=(const symbol_code&, const symbol_code&)
+        assert_eq!(true, SymbolCode::from("A") != SymbolCode::new());
+        assert_eq!(true, SymbolCode::from("Z") != SymbolCode::new());
+        assert_eq!(true, SymbolCode::from("AAAAAAA") != SymbolCode::new());
+        assert_eq!(true, SymbolCode::from("ZZZZZZZ") != SymbolCode::new());
+    }
+
+    #[test]
+    fn test_cdt_10() {
+        // friend bool operator<(const symbol_code&, const symbol_code&)
+        assert_eq!(true, SymbolCode::new() < SymbolCode::from("A"));
+        assert_eq!(true, SymbolCode::new() < SymbolCode::from("Z"));
+        assert_eq!(true, SymbolCode::new() < SymbolCode::from("AAAAAAA"));
+        assert_eq!(true, SymbolCode::new() < SymbolCode::from("ZZZZZZZ"));
+    }
+
+    #[test]
+    #[should_panic(expected = "string is too long to be a valid symbol_code")]
+    fn test_cdt_panic_1() {
+        let _symcode = SymbolCode::from("ABCDEFGH");
+    }
+
+    #[test]
+    #[allow(unused)]
+    #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
+    fn test_cdt_panic_2() {
+        SymbolCode::from("a");
+        SymbolCode::from("z");
+        SymbolCode::from("@");
+        SymbolCode::from("[");
+    }
 
     #[test]
     fn test_as_ref() {
