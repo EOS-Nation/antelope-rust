@@ -453,70 +453,6 @@ mod tests {
     }
 
     #[test]
-    fn test_cdt_7() {
-        // EOSIO_TEST_BEGIN(name_type_test_op_bool)
-        // // ---------------------------------------
-
-        // EOSIO_TEST_END
-
-        // EOSIO_TEST_BEGIN(name_type_test_memcmp)
-        // // ----------------------------------------
-        // // char* write_as_string(char*, char*)const
-        // constexpr uint8_t buffer_size{32);
-        // char buffer[buffer_size]{);
-
-        // string str::from("1");
-        // Name::from(str).write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // Name::from(str = "5").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // Name::from(str = "a").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // Name::from(str = "z").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-
-        // Name::from(str = "abc").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // Name::from(str = "123").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-
-        // // Note:
-        // // Any '.' characters at the end of a name are ignored
-        // Name::from(str = ".abc").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // Name::from(str = ".........abc").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // Name::from(str = "123.").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp("123", buffer, 3), 0 );
-        // Name::from(str = "123.........").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp("123", buffer, 3), 0 );
-        // Name::from(str = ".a.b.c.1.2.3.").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(".a.b.c.1.2.3", buffer, 12), 0 );
-
-        // Name::from(str = "abc.123").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // Name::from(str = "123.abc").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-
-        // Name::from(str = "12345abcdefgj").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // Name::from(str = "hijklmnopqrsj").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // Name::from(str = "tuvwxyz.1234j").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-
-        // Name::from(str = "111111111111j").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // Name::from(str = "555555555555j").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // Name::from(str = "aaaaaaaaaaaaj").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // Name::from(str = "zzzzzzzzzzzzj").write_as_string( buffer, buffer + sizeof(buffer) );
-        // assert_eq!(memcmp(str.c_str(), buffer, strlen(str.c_str())), 0 );
-        // EOSIO_TEST_END
-    }
-
-    #[test]
     fn test_cdt_8() {
         // string to_string()const
         assert_eq!(Name::from("1").to_string(), "1");
@@ -748,6 +684,12 @@ mod tests {
         let name = Name::from("aaaaaaaaaaaa");
         let name_ref = name.as_ref();
         assert_eq!(name_ref.to_string(), "aaaaaaaaaaaa");
+    }
+
+    #[test]
+    fn test_from_self() {
+        let name = Name::from("aaaaaaaaaaaa");
+        assert_eq!(Name::from(name), name);
     }
 
     proptest! {

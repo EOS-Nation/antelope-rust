@@ -374,11 +374,6 @@ mod tests {
     }
 
     #[test]
-    fn test_clone() {
-        assert_eq!(5197638, SymbolCode::from("FOO").clone().value);
-    }
-
-    #[test]
     fn test_length() {
         assert_eq!(1, SymbolCode::from("A").length());
         assert_eq!(2, SymbolCode::from("AB").length());
@@ -472,7 +467,7 @@ mod tests {
     }
 
     #[test]
-    fn test_symbol_code_ord() {
+    fn test_ord() {
         let symbol_code1 = SymbolCode::from("ABCDEFG");
         let symbol_code2 = SymbolCode::from("ABCDEFH");
         let symbol_code3 = SymbolCode::from("ABCDEF");
@@ -485,10 +480,17 @@ mod tests {
     }
 
     #[test]
-    fn test_symbol_code_clone() {
+    fn test_clone() {
         let symbol_code = SymbolCode::from("ABCDEFG");
         let cloned_symbol_code = symbol_code.clone();
         assert_eq!(symbol_code, cloned_symbol_code);
+        assert_eq!(5197638, SymbolCode::from("FOO").clone().value);
+    }
+
+    #[test]
+    fn test_from_self() {
+        let symcode = SymbolCode::from("ABCDEFG");
+        assert_eq!(SymbolCode::from(symcode), symcode);
     }
 
     proptest! {

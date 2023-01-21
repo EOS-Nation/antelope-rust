@@ -345,6 +345,12 @@ mod tests {
         SymbolCode::from("SYM,10");
     }
 
+    #[test]
+    fn test_from_self() {
+        let sym = Symbol::from("4,ABCDEFG");
+        assert_eq!(Symbol::from(sym), sym);
+    }
+
     proptest! {
         #[test]
         fn random_symbols(precision in 0..100, symcode in "[[A-Z]]{1,7}") {
