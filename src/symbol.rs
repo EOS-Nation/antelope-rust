@@ -156,7 +156,6 @@ mod tests {
     use super::*;
     use proptest::prelude::*;
 
-
     #[test]
     fn test_cdt_1() {
         //// constexpr uint64_t raw()const
@@ -348,9 +347,10 @@ mod tests {
 
     proptest! {
         #[test]
-        fn random_symbols(input in "[[1-9]]{1,2},[[A-Z]]{1,7}") {
-            let sym = Symbol::from(input.as_str());
-            prop_assert_eq!(sym.to_string(), input);
+        fn random_symbols(precision in 0..100, symcode in "[[A-Z]]{1,7}") {
+            let sym_str = format!("{},{}", precision, symcode);
+            let sym = Symbol::from(sym_str.as_str());
+            prop_assert_eq!(sym.to_string(), sym_str);
         }
     }
 }
