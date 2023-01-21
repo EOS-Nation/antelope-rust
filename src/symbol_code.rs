@@ -356,11 +356,15 @@ mod tests {
     #[test]
     #[allow(unused)]
     #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
-    fn test_cdt_panic_2() {
+    fn test_cdt_panic_2a() {
         SymbolCode::from("a");
-        SymbolCode::from("z");
+    }
+
+    #[test]
+    #[allow(unused)]
+    #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
+    fn test_cdt_panic_2b() {
         SymbolCode::from("@");
-        SymbolCode::from("[");
     }
 
     #[test]

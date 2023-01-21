@@ -1,4 +1,4 @@
-use crate::SymbolCode;
+use crate::{check, SymbolCode};
 
 use std::cmp::{Ord, PartialEq, PartialOrd};
 use std::convert::From;
@@ -101,9 +101,11 @@ impl From<&str> for Symbol {
     #[must_use]
     fn from(str: &str) -> Self {
         let parts = str.split(',').collect::<Vec<&str>>();
-        let precision = parts[0].parse::<u8>().unwrap();
+        check(parts.len() == 2, "invalid symbol format");
+        let precision = parts[0].parse::<u8>();
+        check(precision.is_ok(), "invalid symbol precision");
         let symcode = SymbolCode::from(parts[1]);
-        Symbol::from_precision(symcode, precision)
+        Symbol::from_precision(symcode, precision.unwrap())
     }
 }
 
@@ -295,5 +297,50 @@ mod tests {
         assert_eq!(true, Symbol::new() < Symbol::from_precision(sc1, 0));
         assert_eq!(true, Symbol::new() < Symbol::from_precision(sc2, 0));
         assert_eq!(true, Symbol::new() < Symbol::from_precision(sc3, 0));
+    }
+
+    #[test]
+    fn test_from_str() {
+        assert_eq!(
+            Symbol::from("10,SYM"),
+            Symbol::from_precision(SymbolCode::from("SYM"), 10)
+        );
+        // CDT allows empty symbol code
+        assert_eq!(
+            Symbol::from("0,"),
+            Symbol::from_precision(SymbolCode::from(""), 0)
+        );
+        assert_eq!(Symbol::from("5,SYM").to_string(), "5,SYM");
+        assert_eq!(Symbol::from("50,SYM").to_string(), "50,SYM"); // CDT doesn't check precision, could be > 18
+        assert_eq!(Symbol::from("5,SYM").precision(), 5);
+        assert_eq!(Symbol::from("5,SYM").code(), SymbolCode::from("SYM"));
+    }
+
+    #[test]
+    #[allow(unused)]
+    #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
+    fn test_from_str_panic_1() {
+        Symbol::from("10,a");
+    }
+
+    #[test]
+    #[allow(unused)]
+    #[should_panic(expected = "invalid symbol precision")]
+    fn test_from_str_panic_2() {
+        Symbol::from("1000,SYM");
+    }
+
+    #[test]
+    #[allow(unused)]
+    #[should_panic(expected = "invalid symbol format")]
+    fn test_from_str_panic_3() {
+        Symbol::from("10SYM");
+    }
+
+    #[test]
+    #[allow(unused)]
+    #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
+    fn test_from_str_panic_4() {
+        SymbolCode::from("SYM,10");
     }
 }
