@@ -29,6 +29,10 @@ pub use self::check::check;
 pub mod symbol_code;
 pub use self::symbol_code::SymbolCode;
 
+/// Modules for Symbol type.
+pub mod symbol;
+pub use self::symbol::Symbol;
+
 /// Modules for Name type.
 pub mod name;
 pub use self::name::Name;

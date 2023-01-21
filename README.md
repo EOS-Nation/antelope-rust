@@ -11,7 +11,7 @@ Implements most commonly used [Antelope C++ Classes](https://github.com/Antelope
 
 ### https://docs.rs/antelope
 
-## Feature Roadmap
+## 🛠 Feature Roadmap
 
 - [ ] [`symbol`](https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio/symbol.hpp)
     - [x] [`symbol_code`](https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio/symbol.hpp)

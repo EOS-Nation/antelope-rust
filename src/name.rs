@@ -44,6 +44,11 @@ impl Name {
     pub fn new() -> Self {
         Self { value: 0 }
     }
+
+    #[must_use]
+    pub fn raw(&self) -> u64 {
+        self.value
+    }
 }
 
 #[must_use]
@@ -135,8 +140,18 @@ impl From<&str> for Name {
 }
 
 impl From<u64> for Name {
+    #[inline]
+    #[must_use]
     fn from(value: u64) -> Self {
         Name { value }
+    }
+}
+
+impl From<Name> for u64 {
+    #[inline]
+    #[must_use]
+    fn from(name: Name) -> Self {
+        name.value
     }
 }
 
@@ -154,7 +169,8 @@ mod tests {
     #[test]
     fn test_name_new() {
         let name = Name::new();
-        assert_eq!(name.value, 0);
+        assert_eq!(0, name.raw());
+        assert_eq!(0 as u64, Name::new().into());
     }
 
     #[test]

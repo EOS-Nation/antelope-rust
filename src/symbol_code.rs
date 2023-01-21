@@ -57,6 +57,7 @@ impl SymbolCode {
     /// let symcode = SymbolCode::from("FOO");
     /// assert_eq!(5197638, symcode.raw());
     /// ```
+    #[inline]
     #[must_use]
     pub fn raw(&self) -> u64 {
         self.value
@@ -76,6 +77,7 @@ impl SymbolCode {
     /// let len = SymbolCode::from("FOO").length();
     /// assert_eq!(3, len);
     /// ```
+    #[inline]
     #[must_use]
     pub fn length(&self) -> u32 {
         let mut sym: u64 = self.value;
@@ -100,6 +102,7 @@ impl SymbolCode {
     /// let symcode = SymbolCode::from("FOO");
     /// assert_eq!(true, symcode.is_valid());
     /// ```
+    #[inline]
     #[must_use]
     pub fn is_valid(&self) -> bool {
         let mut sym: u64 = self.value;
@@ -126,9 +129,9 @@ impl SymbolCode {
 
     /// Returns a new symbol code
     ///
-    /// The new symbol code is constructed from the given string
+    /// The new symbol code is empty
     ///
-    /// The string must be at most 7 characters long and contain only uppercase letters
+    /// The new symbol code has a raw value of 0
     ///
     /// # Examples
     ///
@@ -136,7 +139,9 @@ impl SymbolCode {
     /// use antelope::SymbolCode;
     ///
     /// let symcode = SymbolCode::new();
-    /// assert_eq!("", symcode.to_string());
+    /// assert_eq!(0, symcode.raw());
+    /// ```
+    #[inline]
     #[must_use]
     pub fn new() -> Self {
         Self { value: 0 }
@@ -144,6 +149,7 @@ impl SymbolCode {
 }
 
 impl Display for SymbolCode {
+    #[inline]
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         let mask = 0x00000000000000FF;
         if self.value == 0 {
@@ -167,6 +173,8 @@ impl Display for SymbolCode {
 }
 
 impl From<&str> for SymbolCode {
+    #[inline]
+    #[must_use]
     fn from(str: &str) -> Self {
         let mut value: u64 = 0;
         check(
@@ -186,12 +194,24 @@ impl From<&str> for SymbolCode {
 }
 
 impl From<u64> for SymbolCode {
+    #[inline]
+    #[must_use]
     fn from(value: u64) -> Self {
         SymbolCode { value }
     }
 }
 
+impl From<SymbolCode> for u64 {
+    #[inline]
+    #[must_use]
+    fn from(symcode: SymbolCode) -> Self {
+        symcode.value
+    }
+}
+
 impl AsRef<SymbolCode> for SymbolCode {
+    #[inline]
+    #[must_use]
     fn as_ref(&self) -> &SymbolCode {
         self
     }
@@ -200,6 +220,8 @@ impl AsRef<SymbolCode> for SymbolCode {
 impl Not for SymbolCode {
     type Output = bool;
 
+    #[inline]
+    #[must_use]
     fn not(self) -> bool {
         self.value == 0
     }
@@ -215,6 +237,7 @@ mod symbol_code_tests {
         //// constexpr symbol_code()
         // constexpr uint64_t raw()const
         assert_eq!(0, SymbolCode::new().raw());
+        assert_eq!(0 as u64, SymbolCode::new().into());
     }
 
     #[test]
