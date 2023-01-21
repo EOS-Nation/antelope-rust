@@ -244,15 +244,18 @@ mod symbol_tests {
         assert_eq!(true, !Symbol::from(0));
         assert_eq!(false, !Symbol::from(1));
 
-        assert_eq!(false, !!Symbol::from_precision(SymbolCode::from(""), 0));
-        assert_eq!(
-            true,
-            !!Symbol::from_precision(SymbolCode::from("SYMBOLL"), 0)
-        );
-        assert_eq!(true, !!!Symbol::from_precision(SymbolCode::from(""), 0));
         assert_eq!(
             false,
-            !!!Symbol::from_precision(SymbolCode::from("SYMBOLL"), 0)
+            Symbol::from_precision(SymbolCode::from(""), 0).into()
+        );
+        assert_eq!(
+            true,
+            Symbol::from_precision(SymbolCode::from("SYMBOLL"), 0).into()
+        );
+        assert_eq!(true, !Symbol::from_precision(SymbolCode::from(""), 0));
+        assert_eq!(
+            false,
+            !Symbol::from_precision(SymbolCode::from("SYMBOLL"), 0)
         );
     }
 
