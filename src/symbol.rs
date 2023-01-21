@@ -141,6 +141,14 @@ impl Not for Symbol {
     }
 }
 
+impl From<Symbol> for bool {
+    #[inline]
+    #[must_use]
+    fn from(sym: Symbol) -> Self {
+        sym.raw() != 0
+    }
+}
+
 #[cfg(test)]
 mod symbol_tests {
     use super::*;
@@ -231,10 +239,10 @@ mod symbol_tests {
     #[test]
     fn test_cdt_7() {
         // constexpr explicit operator bool()const
-        assert_eq!(false, !!Symbol::from(0));
-        assert_eq!(true, !!Symbol::from(1));
-        assert_eq!(true, !!!Symbol::from(0));
-        assert_eq!(false, !!!Symbol::from(1));
+        assert_eq!(false, Symbol::from(0).into());
+        assert_eq!(true, Symbol::from(1).into());
+        assert_eq!(true, !Symbol::from(0));
+        assert_eq!(false, !Symbol::from(1));
 
         assert_eq!(false, !!Symbol::from_precision(SymbolCode::from(""), 0));
         assert_eq!(
