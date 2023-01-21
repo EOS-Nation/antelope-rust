@@ -154,6 +154,8 @@ impl From<Symbol> for bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use proptest::prelude::*;
+
 
     #[test]
     fn test_cdt_1() {
@@ -342,5 +344,13 @@ mod tests {
     #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
     fn test_from_str_panic_4() {
         SymbolCode::from("SYM,10");
+    }
+
+    proptest! {
+        #[test]
+        fn random_symbols(input in "[[1-9]]{1,2},[[A-Z]]{1,7}") {
+            let sym = Symbol::from(input.as_str());
+            prop_assert_eq!(sym.to_string(), input);
+        }
     }
 }
