@@ -150,7 +150,7 @@ impl From<Symbol> for bool {
 }
 
 #[cfg(test)]
-mod symbol_tests {
+mod tests {
     use super::*;
 
     #[test]

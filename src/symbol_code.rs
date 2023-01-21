@@ -236,7 +236,7 @@ impl From<SymbolCode> for bool {
 }
 
 #[cfg(test)]
-mod symbol_code_tests {
+mod tests {
     use super::*;
     use proptest::prelude::*;
 
@@ -347,9 +347,10 @@ mod symbol_code_tests {
     }
 
     #[test]
+    #[allow(unused)]
     #[should_panic(expected = "string is too long to be a valid symbol_code")]
     fn test_cdt_panic_1() {
-        let _symcode = SymbolCode::from("ABCDEFGH");
+        SymbolCode::from("ABCDEFGH");
     }
 
     #[test]
