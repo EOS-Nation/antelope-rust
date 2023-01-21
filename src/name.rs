@@ -85,6 +85,78 @@ impl Name {
             None
         }
     }
+
+    #[must_use]
+    fn prefix(&self) -> Name {
+        let mut result: u64 = self.value;
+        let mut not_dot_character_seen: bool = false;
+        let mut mask: u64 = 0xF;
+
+        // Get characters one-by-one in name in order from right to left
+        let mut offset: i32 = 0;
+        while (offset <= 59) {
+            let c = (self.value >> offset) & mask;
+
+            if (c == 0) {
+                // if this character is a dot
+                if (not_dot_character_seen) {
+                    // we found the rightmost dot character
+                    result = (self.value >> offset) << offset;
+                    break;
+                }
+            } else {
+                not_dot_character_seen = true;
+            }
+
+            if (offset == 0) {
+                offset += 4;
+                mask = 0x1F;
+            } else {
+                offset += 5;
+            }
+        }
+
+        Name::from(result)
+    }
+
+    fn suffix(&self) -> Name {
+        let mut remaining_bits_after_last_actual_dot: u32 = 0;
+        let mut tmp: u32 = 0;
+
+        let mut remaining_bits = 59;
+        while (remaining_bits >= 4) {
+            // Note: remaining_bits must remain signed integer
+            // Get characters one-by-one in name in order from left to right (not including the 13th character)
+            let c = (self.value >> remaining_bits) & 0x1F;
+            if (c == 0) {
+                // if this character is a dot
+                tmp = remaining_bits as u32;
+            } else {
+                // if this character is not a dot
+                remaining_bits_after_last_actual_dot = tmp;
+            }
+            remaining_bits -= 5;
+        }
+
+        let mut thirteenth_character: u64 = self.value & 0x0F;
+        if thirteenth_character != 0 {
+            // if 13th character is not a dot
+            remaining_bits_after_last_actual_dot = tmp;
+        }
+
+        if (remaining_bits_after_last_actual_dot == 0) {
+            // there is no actual dot in the %name other than potentially leading dots
+            return Name::from(self.value);
+        }
+
+        // At this point remaining_bits_after_last_actual_dot has to be within the range of 4 to 59 (and restricted to increments of 5).
+
+        // Mask for remaining bits corresponding to characters after last actual dot, except for 4 least significant bits (corresponds to 13th character).
+        let mask: u64 = (1 << remaining_bits_after_last_actual_dot) - 16;
+        let shift: u32 = 64 - remaining_bits_after_last_actual_dot;
+
+        Name::from(((self.value & mask) << shift) + (thirteenth_character << (shift - 1)))
+    }
 }
 
 #[must_use]
@@ -280,52 +352,88 @@ mod tests {
         assert_eq!(Name::from("eosioaccountj").length(), 13);
     }
 
-    // #[test]
-    // fn test_cdt_4() {
-    //     // constexpr name suffix()const
-    //     assert_eq!(Name::from(".eosioaccounj").suffix(), Name::from("eosioaccounj"));
-    //     assert_eq!(Name::from("e.osioaccounj").suffix(), Name::from("osioaccounj"));
-    //     assert_eq!(Name::from("eo.sioaccounj").suffix(), Name::from("sioaccounj"));
-    //     assert_eq!(Name::from("eos.ioaccounj").suffix(), Name::from("ioaccounj"));
-    //     assert_eq!(Name::from("eosi.oaccounj").suffix(), Name::from("oaccounj"));
-    //     assert_eq!(Name::from("eosio.accounj").suffix(), Name::from("accounj"));
-    //     assert_eq!(Name::from("eosioa.ccounj").suffix(), Name::from("ccounj"));
-    //     assert_eq!(Name::from("eosioac.counj").suffix(), Name::from("counj"));
-    //     assert_eq!(Name::from("eosioacc.ounj").suffix(), Name::from("ounj"));
-    //     assert_eq!(Name::from("eosioacco.unj").suffix(), Name::from("unj"));
-    //     assert_eq!(Name::from("eosioaccou.nj").suffix(), Name::from("nj"));
-    //     assert_eq!(Name::from("eosioaccoun.j").suffix(), Name::from("j"));
+    #[test]
+    fn test_cdt_4() {
+        // constexpr name suffix()const
+        assert_eq!(
+            Name::from(".eosioaccounj").suffix(),
+            Name::from("eosioaccounj")
+        );
+        assert_eq!(
+            Name::from("e.osioaccounj").suffix(),
+            Name::from("osioaccounj")
+        );
+        assert_eq!(
+            Name::from("eo.sioaccounj").suffix(),
+            Name::from("sioaccounj")
+        );
+        assert_eq!(
+            Name::from("eos.ioaccounj").suffix(),
+            Name::from("ioaccounj")
+        );
+        assert_eq!(Name::from("eosi.oaccounj").suffix(), Name::from("oaccounj"));
+        assert_eq!(Name::from("eosio.accounj").suffix(), Name::from("accounj"));
+        assert_eq!(Name::from("eosioa.ccounj").suffix(), Name::from("ccounj"));
+        assert_eq!(Name::from("eosioac.counj").suffix(), Name::from("counj"));
+        assert_eq!(Name::from("eosioacc.ounj").suffix(), Name::from("ounj"));
+        assert_eq!(Name::from("eosioacco.unj").suffix(), Name::from("unj"));
+        assert_eq!(Name::from("eosioaccou.nj").suffix(), Name::from("nj"));
+        assert_eq!(Name::from("eosioaccoun.j").suffix(), Name::from("j"));
 
-    //     assert_eq!(Name::from("e.o.s.i.o.a.c").suffix(), Name::from("c"));
-    //     assert_eq!(Name::from("eos.ioa.cco").suffix(), Name::from("cco"));
-    // }
+        assert_eq!(Name::from("e.o.s.i.o.a.c").suffix(), Name::from("c"));
+        assert_eq!(Name::from("eos.ioa.cco").suffix(), Name::from("cco"));
+    }
 
-    // #[test]
-    // fn test_cdt_5() {
-    //     // constexpr name prefix()const
-    //     assert_eq!(Name::from(".eosioaccounj").prefix(), Name::new());
-    //     assert_eq!(Name::from("e.osioaccounj").prefix(), Name::from("e"));
-    //     assert_eq!(Name::from("eo.sioaccounj").prefix(), Name::from("eo"));
-    //     assert_eq!(Name::from("eos.ioaccounj").prefix(), Name::from("eos"));
-    //     assert_eq!(Name::from("eosi.oaccounj").prefix(), Name::from("eosi"));
-    //     assert_eq!(Name::from("eosio.accounj").prefix(), Name::from("eosio"));
-    //     assert_eq!(Name::from("eosioa.ccounj").prefix(), Name::from("eosioa"));
-    //     assert_eq!(Name::from("eosioac.counj").prefix(), Name::from("eosioac"));
-    //     assert_eq!(Name::from("eosioacc.ounj").prefix(), Name::from("eosioacc"));
-    //     assert_eq!(Name::from("eosioacco.unj").prefix(), Name::from("eosioacco"));
-    //     assert_eq!(Name::from("eosioaccou.nj").prefix(), Name::from("eosioaccou"));
-    //     assert_eq!(Name::from("eosioaccoun.j").prefix(), Name::from("eosioaccoun"));
-    //     assert_eq!(Name::from("eosioaccounj.").prefix(), Name::from("eosioaccounj"));
-    //     assert_eq!(Name::from("eosioaccountj").prefix(), Name::from("eosioaccountj"));
+    #[test]
+    fn test_cdt_5() {
+        // constexpr name prefix()const
+        assert_eq!(Name::from(".eosioaccounj").prefix(), Name::new());
+        assert_eq!(Name::from("e.osioaccounj").prefix(), Name::from("e"));
+        assert_eq!(Name::from("eo.sioaccounj").prefix(), Name::from("eo"));
+        assert_eq!(Name::from("eos.ioaccounj").prefix(), Name::from("eos"));
+        assert_eq!(Name::from("eosi.oaccounj").prefix(), Name::from("eosi"));
+        assert_eq!(Name::from("eosio.accounj").prefix(), Name::from("eosio"));
+        assert_eq!(Name::from("eosioa.ccounj").prefix(), Name::from("eosioa"));
+        assert_eq!(Name::from("eosioac.counj").prefix(), Name::from("eosioac"));
+        assert_eq!(Name::from("eosioacc.ounj").prefix(), Name::from("eosioacc"));
+        assert_eq!(
+            Name::from("eosioacco.unj").prefix(),
+            Name::from("eosioacco")
+        );
+        assert_eq!(
+            Name::from("eosioaccou.nj").prefix(),
+            Name::from("eosioaccou")
+        );
+        assert_eq!(
+            Name::from("eosioaccoun.j").prefix(),
+            Name::from("eosioaccoun")
+        );
+        assert_eq!(
+            Name::from("eosioaccounj.").prefix(),
+            Name::from("eosioaccounj")
+        );
+        assert_eq!(
+            Name::from("eosioaccountj").prefix(),
+            Name::from("eosioaccountj")
+        );
 
-    //     assert_eq!(Name::from("e.o.s.i.o.a.c").prefix(), Name::from("e.o.s.i.o.a"));
-    //     assert_eq!(Name::from("eos.ioa.cco").prefix(), Name::from("eos.ioa"));
+        assert_eq!(
+            Name::from("e.o.s.i.o.a.c").prefix(),
+            Name::from("e.o.s.i.o.a")
+        );
+        assert_eq!(Name::from("eos.ioa.cco").prefix(), Name::from("eos.ioa"));
 
-    //     assert_eq!(Name::from("a.my.account").prefix(), Name::from("a.my"));
-    //     assert_eq!(Name::from("a.my.account").prefix().prefix(), Name::from("a"));
+        assert_eq!(Name::from("a.my.account").prefix(), Name::from("a.my"));
+        assert_eq!(
+            Name::from("a.my.account").prefix().prefix(),
+            Name::from("a")
+        );
 
-    //     assert_eq!( Name::from("e.osioaccounj").prefix() == Name::from("e"), true);
-    // }
+        assert_eq!(
+            Name::from("e.osioaccounj").prefix() == Name::from("e"),
+            true
+        );
+    }
 
     #[test]
     fn test_cdt_6() {
