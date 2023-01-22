@@ -40,3 +40,10 @@ pub use self::extended_symbol::ExtendedSymbol;
 /// Modules for Name type.
 pub mod name;
 pub use self::name::Name;
+
+/// Modules for Asset type.
+pub mod asset;
+pub use self::asset::Asset;
+
+/// Modules for common library type.
+pub mod eosiolib;

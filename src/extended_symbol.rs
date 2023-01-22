@@ -4,7 +4,7 @@ use std::convert::From;
 use std::fmt::{Display, Formatter, Result};
 use std::ops::Not;
 
-/// The `ExtendedSymbol` struct represents a symbol code
+/// The `ExtendedSymbol` struct represents an extended symbol
 ///
 /// Reference: <https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio/symbol.hpp>
 ///
