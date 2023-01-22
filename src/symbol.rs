@@ -247,19 +247,10 @@ mod tests {
         assert_eq!(true, !Symbol::from(0));
         assert_eq!(false, !Symbol::from(1));
 
-        assert_eq!(
-            false,
-            Symbol::from_precision(SymbolCode::from(""), 0).into()
-        );
-        assert_eq!(
-            true,
-            Symbol::from_precision(SymbolCode::from("SYMBOLL"), 0).into()
-        );
+        assert_eq!(false, Symbol::from_precision(SymbolCode::from(""), 0).into());
+        assert_eq!(true, Symbol::from_precision(SymbolCode::from("SYMBOLL"), 0).into());
         assert_eq!(true, !Symbol::from_precision(SymbolCode::from(""), 0));
-        assert_eq!(
-            false,
-            !Symbol::from_precision(SymbolCode::from("SYMBOLL"), 0)
-        );
+        assert_eq!(false, !Symbol::from_precision(SymbolCode::from("SYMBOLL"), 0));
     }
 
     #[test]
@@ -270,22 +261,10 @@ mod tests {
         let sc3 = SymbolCode::from("ZZZZZZZ");
 
         // friend constexpr bool operator==(const symbol&, const symbol&)
-        assert_eq!(
-            true,
-            Symbol::from_precision(sc0, 0) == Symbol::from_precision(sc0, 0)
-        );
-        assert_eq!(
-            true,
-            Symbol::from_precision(sc1, 0) == Symbol::from_precision(sc1, 0)
-        );
-        assert_eq!(
-            true,
-            Symbol::from_precision(sc2, 0) == Symbol::from_precision(sc2, 0)
-        );
-        assert_eq!(
-            true,
-            Symbol::from_precision(sc3, 0) == Symbol::from_precision(sc3, 0)
-        );
+        assert_eq!(true, Symbol::from_precision(sc0, 0) == Symbol::from_precision(sc0, 0));
+        assert_eq!(true, Symbol::from_precision(sc1, 0) == Symbol::from_precision(sc1, 0));
+        assert_eq!(true, Symbol::from_precision(sc2, 0) == Symbol::from_precision(sc2, 0));
+        assert_eq!(true, Symbol::from_precision(sc3, 0) == Symbol::from_precision(sc3, 0));
 
         // friend constexpr bool operator!=(const symbol&, const symbol&)
         assert_eq!(true, Symbol::from_precision(sc0, 0) != Symbol::new());
@@ -302,15 +281,9 @@ mod tests {
 
     #[test]
     fn test_from_str() {
-        assert_eq!(
-            Symbol::from("10,SYM"),
-            Symbol::from_precision(SymbolCode::from("SYM"), 10)
-        );
+        assert_eq!(Symbol::from("10,SYM"), Symbol::from_precision(SymbolCode::from("SYM"), 10));
         // CDT allows empty symbol code
-        assert_eq!(
-            Symbol::from("0,"),
-            Symbol::from_precision(SymbolCode::from(""), 0)
-        );
+        assert_eq!(Symbol::from("0,"), Symbol::from_precision(SymbolCode::from(""), 0));
         assert_eq!(Symbol::from("5,SYM").to_string(), "5,SYM");
         assert_eq!(Symbol::from("50,SYM").to_string(), "50,SYM"); // CDT doesn't check precision, could be > 18
         assert_eq!(Symbol::from("5,SYM").precision(), 5);

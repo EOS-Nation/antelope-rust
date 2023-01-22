@@ -183,9 +183,7 @@ impl fmt::Display for Name {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let bytes = name_to_bytes(self.value);
-        let value = str::from_utf8(&bytes)
-            .map(|s| s.trim_end_matches('.'))
-            .map_err(|_| fmt::Error)?;
+        let value = str::from_utf8(&bytes).map(|s| s.trim_end_matches('.')).map_err(|_| fmt::Error)?;
         write!(f, "{}", value)
     }
 }
@@ -355,22 +353,10 @@ mod tests {
     #[test]
     fn test_cdt_4() {
         // constexpr name suffix()const
-        assert_eq!(
-            Name::from(".eosioaccounj").suffix(),
-            Name::from("eosioaccounj")
-        );
-        assert_eq!(
-            Name::from("e.osioaccounj").suffix(),
-            Name::from("osioaccounj")
-        );
-        assert_eq!(
-            Name::from("eo.sioaccounj").suffix(),
-            Name::from("sioaccounj")
-        );
-        assert_eq!(
-            Name::from("eos.ioaccounj").suffix(),
-            Name::from("ioaccounj")
-        );
+        assert_eq!(Name::from(".eosioaccounj").suffix(), Name::from("eosioaccounj"));
+        assert_eq!(Name::from("e.osioaccounj").suffix(), Name::from("osioaccounj"));
+        assert_eq!(Name::from("eo.sioaccounj").suffix(), Name::from("sioaccounj"));
+        assert_eq!(Name::from("eos.ioaccounj").suffix(), Name::from("ioaccounj"));
         assert_eq!(Name::from("eosi.oaccounj").suffix(), Name::from("oaccounj"));
         assert_eq!(Name::from("eosio.accounj").suffix(), Name::from("accounj"));
         assert_eq!(Name::from("eosioa.ccounj").suffix(), Name::from("ccounj"));
@@ -396,43 +382,19 @@ mod tests {
         assert_eq!(Name::from("eosioa.ccounj").prefix(), Name::from("eosioa"));
         assert_eq!(Name::from("eosioac.counj").prefix(), Name::from("eosioac"));
         assert_eq!(Name::from("eosioacc.ounj").prefix(), Name::from("eosioacc"));
-        assert_eq!(
-            Name::from("eosioacco.unj").prefix(),
-            Name::from("eosioacco")
-        );
-        assert_eq!(
-            Name::from("eosioaccou.nj").prefix(),
-            Name::from("eosioaccou")
-        );
-        assert_eq!(
-            Name::from("eosioaccoun.j").prefix(),
-            Name::from("eosioaccoun")
-        );
-        assert_eq!(
-            Name::from("eosioaccounj.").prefix(),
-            Name::from("eosioaccounj")
-        );
-        assert_eq!(
-            Name::from("eosioaccountj").prefix(),
-            Name::from("eosioaccountj")
-        );
+        assert_eq!(Name::from("eosioacco.unj").prefix(), Name::from("eosioacco"));
+        assert_eq!(Name::from("eosioaccou.nj").prefix(), Name::from("eosioaccou"));
+        assert_eq!(Name::from("eosioaccoun.j").prefix(), Name::from("eosioaccoun"));
+        assert_eq!(Name::from("eosioaccounj.").prefix(), Name::from("eosioaccounj"));
+        assert_eq!(Name::from("eosioaccountj").prefix(), Name::from("eosioaccountj"));
 
-        assert_eq!(
-            Name::from("e.o.s.i.o.a.c").prefix(),
-            Name::from("e.o.s.i.o.a")
-        );
+        assert_eq!(Name::from("e.o.s.i.o.a.c").prefix(), Name::from("e.o.s.i.o.a"));
         assert_eq!(Name::from("eos.ioa.cco").prefix(), Name::from("eos.ioa"));
 
         assert_eq!(Name::from("a.my.account").prefix(), Name::from("a.my"));
-        assert_eq!(
-            Name::from("a.my.account").prefix().prefix(),
-            Name::from("a")
-        );
+        assert_eq!(Name::from("a.my.account").prefix().prefix(), Name::from("a"));
 
-        assert_eq!(
-            Name::from("e.osioaccounj").prefix() == Name::from("e"),
-            true
-        );
+        assert_eq!(Name::from("e.osioaccounj").prefix() == Name::from("e"), true);
     }
 
     #[test]
@@ -496,49 +458,22 @@ mod tests {
         assert_eq!(Name::from("123") == Name::from("123"), true);
 
         assert_eq!(Name::from(".abc") == Name::from(".abc"), true);
-        assert_eq!(
-            Name::from(".........abc") == Name::from(".........abc"),
-            true
-        );
+        assert_eq!(Name::from(".........abc") == Name::from(".........abc"), true);
         assert_eq!(Name::from("123.") == Name::from("123"), true);
         assert_eq!(Name::from("123.........") == Name::from("123"), true);
-        assert_eq!(
-            Name::from(".a.b.c.1.2.3.") == Name::from(".a.b.c.1.2.3"),
-            true
-        );
+        assert_eq!(Name::from(".a.b.c.1.2.3.") == Name::from(".a.b.c.1.2.3"), true);
 
         assert_eq!(Name::from("abc.123") == Name::from("abc.123"), true);
         assert_eq!(Name::from("123.abc") == Name::from("123.abc"), true);
 
-        assert_eq!(
-            Name::from("12345abcdefgj") == Name::from("12345abcdefgj"),
-            true
-        );
-        assert_eq!(
-            Name::from("hijklmnopqrsj") == Name::from("hijklmnopqrsj"),
-            true
-        );
-        assert_eq!(
-            Name::from("tuvwxyz.1234j") == Name::from("tuvwxyz.1234j"),
-            true
-        );
+        assert_eq!(Name::from("12345abcdefgj") == Name::from("12345abcdefgj"), true);
+        assert_eq!(Name::from("hijklmnopqrsj") == Name::from("hijklmnopqrsj"), true);
+        assert_eq!(Name::from("tuvwxyz.1234j") == Name::from("tuvwxyz.1234j"), true);
 
-        assert_eq!(
-            Name::from("111111111111j") == Name::from("111111111111j"),
-            true
-        );
-        assert_eq!(
-            Name::from("555555555555j") == Name::from("555555555555j"),
-            true
-        );
-        assert_eq!(
-            Name::from("aaaaaaaaaaaaj") == Name::from("aaaaaaaaaaaaj"),
-            true
-        );
-        assert_eq!(
-            Name::from("zzzzzzzzzzzzj") == Name::from("zzzzzzzzzzzzj"),
-            true
-        );
+        assert_eq!(Name::from("111111111111j") == Name::from("111111111111j"), true);
+        assert_eq!(Name::from("555555555555j") == Name::from("555555555555j"), true);
+        assert_eq!(Name::from("aaaaaaaaaaaaj") == Name::from("aaaaaaaaaaaaj"), true);
+        assert_eq!(Name::from("zzzzzzzzzzzzj") == Name::from("zzzzzzzzzzzzj"), true);
 
         // test constexpr
         assert_eq!(Name::from("1") == Name::from("1"), true);

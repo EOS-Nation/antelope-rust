@@ -177,15 +177,9 @@ impl From<&str> for SymbolCode {
     #[must_use]
     fn from(str: &str) -> Self {
         let mut value: u64 = 0;
-        check(
-            str.len() <= 7,
-            "string is too long to be a valid symbol_code",
-        );
+        check(str.len() <= 7, "string is too long to be a valid symbol_code");
         for c in str.chars().rev() {
-            check(
-                ('A'..='Z').contains(&c),
-                "only uppercase letters allowed in symbol_code string",
-            );
+            check(('A'..='Z').contains(&c), "only uppercase letters allowed in symbol_code string");
             value <<= 8;
             value |= c as u64;
         }
@@ -318,14 +312,8 @@ mod tests {
         // friend bool operator==(const symbol_code&, const symbol_code&)
         assert_eq!(true, SymbolCode::from("A") == SymbolCode::from("A"));
         assert_eq!(true, SymbolCode::from("Z") == SymbolCode::from("Z"));
-        assert_eq!(
-            true,
-            SymbolCode::from("AAAAAAA") == SymbolCode::from("AAAAAAA")
-        );
-        assert_eq!(
-            true,
-            SymbolCode::from("ZZZZZZZ") == SymbolCode::from("ZZZZZZZ")
-        );
+        assert_eq!(true, SymbolCode::from("AAAAAAA") == SymbolCode::from("AAAAAAA"));
+        assert_eq!(true, SymbolCode::from("ZZZZZZZ") == SymbolCode::from("ZZZZZZZ"));
     }
 
     #[test]
