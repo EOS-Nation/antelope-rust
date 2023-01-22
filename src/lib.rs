@@ -33,6 +33,10 @@ pub use self::symbol_code::SymbolCode;
 pub mod symbol;
 pub use self::symbol::Symbol;
 
+/// Modules for Extended Symbol type.
+pub mod extended_symbol;
+pub use self::extended_symbol::ExtendedSymbol;
+
 /// Modules for Name type.
 pub mod name;
 pub use self::name::Name;
