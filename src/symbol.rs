@@ -80,7 +80,6 @@ impl Symbol {
         Self { value: 0 }
     }
 
-    // QUESTION: should symcode be a reference? `symcode: &SymbolCode`
     #[inline]
     #[must_use]
     pub fn from_precision(symcode: SymbolCode, precision: u8) -> Self {
