@@ -2,9 +2,6 @@ use crate::{check, Symbol};
 use std::cmp::{Ord, PartialEq, PartialOrd};
 // use std::convert::From;
 // use std::fmt::{Display, Formatter, Result};
-// use std::ops::Not;
-
-pub const MAX_AMOUNT: i64 = (1 << 62) - 1;
 
 /// The `Asset` struct represents a asset
 ///
@@ -25,6 +22,8 @@ pub struct Asset {
 }
 
 impl Asset {
+    pub const MAX_AMOUNT: i64 = (1 << 62) - 1;
+
     #[inline]
     #[must_use]
     pub fn new() -> Self {
@@ -47,7 +46,7 @@ impl Asset {
      * @return false - otherwise
      */
     pub fn is_amount_within_range(&self) -> bool {
-        -MAX_AMOUNT <= self.amount && self.amount <= MAX_AMOUNT
+        -Asset::MAX_AMOUNT <= self.amount && self.amount <= Asset::MAX_AMOUNT
     }
 
     /**
@@ -91,31 +90,13 @@ impl Asset {
 //     }
 // }
 
-// impl AsRef<Asset> for Asset {
-//     #[inline]
-//     #[must_use]
-//     fn as_ref(&self) -> &Asset {
-//         self
-//     }
-// }
-
-// impl Not for Asset {
-//     type Output = bool;
-
-//     #[inline]
-//     #[must_use]
-//     fn not(self) -> bool {
-//         self.contract.raw() == 0 && self.sym.raw() == 0
-//     }
-// }
-
-// impl From<Asset> for bool {
-//     #[inline]
-//     #[must_use]
-//     fn from(ext_sym: Asset) -> Self {
-//         ext_sym.contract.raw() != 0 && ext_sym.sym.raw() != 0
-//     }
-// }
+impl AsRef<Asset> for Asset {
+    #[inline]
+    #[must_use]
+    fn as_ref(&self) -> &Asset {
+        self
+    }
+}
 
 #[cfg(test)]
 mod tests {
