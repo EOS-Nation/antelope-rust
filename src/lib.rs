@@ -23,27 +23,28 @@
 
 /// Modules for Asserts type.
 pub mod check;
-pub use self::check::check;
+pub use self::check::*;
 
 /// Modules for Symbol Code type.
 pub mod symbol_code;
-pub use self::symbol_code::SymbolCode;
+pub use self::symbol_code::*;
 
 /// Modules for Symbol type.
 pub mod symbol;
-pub use self::symbol::Symbol;
+pub use self::symbol::*;
 
 /// Modules for Extended Symbol type.
 pub mod extended_symbol;
-pub use self::extended_symbol::ExtendedSymbol;
+pub use self::extended_symbol::*;
 
 /// Modules for Name type.
 pub mod name;
-pub use self::name::Name;
+pub use self::name::*;
 
 /// Modules for Asset type.
 pub mod asset;
-pub use self::asset::Asset;
+pub use self::asset::*;
 
 /// Modules for common library type.
 pub mod eosiolib;
+pub use self::eosiolib::*;

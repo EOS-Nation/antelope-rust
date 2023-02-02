@@ -184,7 +184,7 @@ impl fmt::Display for Name {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let bytes = name_to_bytes(self.value);
         let value = str::from_utf8(&bytes).map(|s| s.trim_end_matches('.')).map_err(|_| fmt::Error)?;
-        write!(f, "{}", value)
+        write!(f, "{value}")
     }
 }
 
