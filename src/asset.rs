@@ -1,5 +1,4 @@
 use crate::{check, Symbol};
-use std::cmp::{Ord, PartialEq, PartialOrd};
 // use std::convert::From;
 // use std::fmt::{Display, Formatter, Result};
 
@@ -15,7 +14,7 @@ use std::cmp::{Ord, PartialEq, PartialOrd};
 /// let quantity = Asset::from_amount(10000, Symbol::from("4,FOO"));
 /// assert_eq!(10000, quantity.amount);
 /// ```
-#[derive(Eq, Copy, Clone, Debug, PartialEq, PartialOrd, Ord, Default)]
+#[derive(std::cmp::Eq, Copy, Clone, Debug, Default)]
 pub struct Asset {
     pub amount: i64,
     pub symbol: Symbol,
@@ -113,6 +112,38 @@ impl std::ops::Neg for Asset {
     }
 }
 
+impl std::cmp::PartialEq for Asset {
+    fn eq(&self, other: &Asset) -> bool {
+        check(
+            self.symbol == other.symbol,
+            "comparison of assets with different symbols is not allowed",
+        );
+        self.amount == other.amount
+    }
+}
+
+impl std::cmp::PartialOrd for Asset {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        check(
+            self.symbol == other.symbol,
+            "comparison of assets with different symbols is not allowed",
+        );
+
+        self.amount.partial_cmp(&other.amount)
+    }
+}
+
+impl std::cmp::Ord for Asset {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        check(
+            self.symbol == other.symbol,
+            "comparison of assets with different symbols is not allowed",
+        );
+
+        self.amount.cmp(&other.amount)
+    }
+}
+
 impl std::ops::SubAssign for Asset {
     /**
      * Subtraction assignment operator
@@ -160,6 +191,22 @@ impl std::ops::MulAssign<i64> for Asset {
     }
 }
 
+impl std::ops::DivAssign<i64> for Asset {
+    /**
+     * Division assignment operator, with a number proceeding
+     *
+     * @brief Division assignment operator, with a number proceeding
+     * @param self - The asset to be divided
+     * @param a - The divisor for the asset's amount
+     * @return asset - Reference to the asset, which has been divided
+     */
+    fn div_assign(&mut self, a: i64) {
+        check(a != 0, "divide by zero");
+        check(!(self.amount == std::i64::MIN && a == -1), "signed division overflow");
+        self.amount /= a;
+    }
+}
+
 impl std::ops::Add for Asset {
     type Output = Self;
 
@@ -189,6 +236,74 @@ impl std::ops::Sub for Asset {
         let mut result = self;
         result -= other;
         result
+    }
+}
+
+impl std::ops::Mul<i64> for Asset {
+    type Output = Asset;
+
+    /**
+     * Multiplication operator, with a number proceeding
+     *
+     * @brief Multiplication operator, with a number proceeding
+     * @param a - The asset to be multiplied
+     * @param b - The multiplier for the asset's amount
+     * @return asset - New asset as the result of multiplication
+     */
+    fn mul(self, b: i64) -> Asset {
+        let mut result = self;
+        result *= b;
+        result
+    }
+}
+
+impl std::ops::Mul<Asset> for i64 {
+    type Output = Asset;
+
+    /**
+     * Multiplication operator, with a number preceeding
+     *
+     * @param a - The multiplier for the asset's amount
+     * @param b - The asset to be multiplied
+     * @return asset - New asset as the result of multiplication
+     */
+    fn mul(self, a: Asset) -> Asset {
+        a * self
+    }
+}
+
+impl std::ops::Div<i64> for Asset {
+    type Output = Asset;
+
+    /**
+     * Division operator, with a number proceeding
+     *
+     * @param a - The asset to be divided
+     * @param b - The divisor for the asset's amount
+     * @return asset - New asset as the result of division
+     */
+    fn div(self, b: i64) -> Asset {
+        let mut result = self;
+        result /= b;
+        result
+    }
+}
+
+impl std::ops::Div<Asset> for Asset {
+    type Output = i64;
+
+    /**
+     * Division operator, with another asset
+     *
+     * @param a - The asset which amount acts as the dividend
+     * @param b - The asset which amount acts as the divisor
+     * @return int64_t - the resulted amount after the division
+     * @pre Both asset must have the same symbol
+     */
+    fn div(self, b: Asset) -> Self::Output {
+        assert_ne!(b.amount, 0, "divide by zero");
+        assert_eq!(self.symbol, b.symbol, "attempt to divide assets with different symbol");
+        self.amount / b.amount
     }
 }
 
@@ -226,21 +341,91 @@ mod tests {
     }
 
     #[test]
-    fn test_asset_inequality() {
+    #[should_panic(expected = "comparison of assets with different symbols is not allowed")]
+    fn test_equality_operator_panics() {
         let asset1 = Asset {
-            amount: 1000,
-            symbol: Symbol::from("4,SYS"),
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
         };
+
         let asset2 = Asset {
-            amount: 1000,
-            symbol: Symbol::from("5,SYS"),
+            amount: 100,
+            symbol: Symbol::from("5,SYM"),
         };
-        let asset3 = Asset {
-            amount: 1001,
-            symbol: Symbol::from("4,SYS"),
+
+        let _ = asset1 == asset2;
+    }
+
+    #[test]
+    fn test_inequality_operator() {
+        let asset1 = Asset {
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
         };
+
+        let asset2 = Asset {
+            amount: 200,
+            symbol: Symbol::from("4,SYM"),
+        };
+
         assert_ne!(asset1, asset2);
-        assert_ne!(asset1, asset3);
+    }
+
+    #[test]
+    #[should_panic(expected = "comparison of assets with different symbols is not allowed")]
+    fn test_inequality_operator_panics() {
+        let asset1 = Asset {
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        let asset2 = Asset {
+            amount: 100,
+            symbol: Symbol::from("5,SYM"),
+        };
+
+        let _ = asset1 != asset2;
+    }
+
+    #[test]
+    fn test_ord_operator() {
+        let asset1 = Asset {
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        let asset2 = Asset {
+            amount: 200,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        let asset3 = Asset {
+            amount: 200,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        assert!(asset1 < asset2);
+        assert!(asset2 > asset1);
+        assert!(asset1 <= asset2);
+        assert!(asset2 >= asset1);
+        assert!(asset3 >= asset2);
+        assert!(asset3 <= asset2);
+    }
+
+    #[test]
+    #[should_panic(expected = "comparison of assets with different symbols is not allowed")]
+    fn test_ord_operator_panics() {
+        let asset1 = Asset {
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        let asset2 = Asset {
+            amount: 100,
+            symbol: Symbol::from("5,SYM"),
+        };
+
+        let _ = asset1 > asset2;
     }
 
     #[test]
@@ -418,5 +603,141 @@ mod tests {
             symbol: Symbol::from("4,SYM"),
         };
         asset1 *= -2;
+    }
+
+    #[test]
+    fn test_multiplication_operator() {
+        let asset1 = Asset {
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        // Test positive multiplier
+        let asset2 = asset1 * 5;
+        assert_eq!(asset2.amount, 500);
+        assert_eq!(asset2.symbol, Symbol::from("4,SYM"));
+
+        // Test negative multiplier
+        let asset3 = -5 * asset1;
+        assert_eq!(asset3.amount, -500);
+        assert_eq!(asset3.symbol, Symbol::from("4,SYM"));
+    }
+
+    #[test]
+    fn test_div_assign() {
+        let mut asset1 = Asset {
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        asset1 /= 2;
+        assert_eq!(asset1.amount, 50);
+
+        asset1 /= -5;
+        assert_eq!(asset1.amount, -10);
+    }
+
+    #[test]
+    #[should_panic(expected = "divide by zero")]
+    fn test_asset_divide_by_zero() {
+        let mut asset1 = Asset {
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        asset1 /= 0;
+    }
+
+    #[test]
+    #[should_panic(expected = "signed division overflow")]
+    fn test_asset_signed_division_overflow() {
+        let mut asset1 = Asset {
+            amount: std::i64::MIN,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        asset1 /= -1;
+    }
+
+    #[test]
+    fn test_divide_operator() {
+        let asset = Asset {
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        let result = asset / 2;
+        assert_eq!(result.amount, 50);
+        assert_eq!(result.symbol, Symbol::from("4,SYM"));
+    }
+
+    #[test]
+    #[should_panic(expected = "divide by zero")]
+    fn test_divide_by_zero() {
+        let asset = Asset {
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        let _ = asset / 0;
+    }
+
+    #[test]
+    #[should_panic(expected = "signed division overflow")]
+    fn test_signed_division_overflow() {
+        let asset = Asset {
+            amount: std::i64::MIN,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        let _ = asset / -1;
+    }
+
+    #[test]
+    fn test_asset_divide_asset_operator() {
+        let asset1 = Asset {
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        let asset2 = Asset {
+            amount: 50,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        let result = asset1 / asset2;
+        assert_eq!(result, 2);
+    }
+
+    #[test]
+    #[should_panic(expected = "attempt to divide assets with different symbol")]
+    fn test_asset_divide_asset_operator_different_symbols() {
+        let asset1 = Asset {
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        let asset2 = Asset {
+            amount: 50,
+            symbol: Symbol::from("5,SYM"),
+        };
+
+        let _ = asset1 / asset2;
+    }
+
+    #[test]
+    #[should_panic(expected = "divide by zero")]
+    fn test_asset_divide_asset_operator_divide_by_zero() {
+        let asset1 = Asset {
+            amount: 100,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        let asset2 = Asset {
+            amount: 0,
+            symbol: Symbol::from("4,SYM"),
+        };
+
+        let _ = asset1 / asset2;
     }
 }
