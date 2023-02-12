@@ -1,7 +1,5 @@
 use crate::{check, Symbol};
 // use std::convert::From;
-// use std::fmt::{Display, Formatter, Result};
-
 /// The `Asset` struct represents a asset
 ///
 /// Reference: <https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio/asset.hpp>
@@ -14,7 +12,7 @@ use crate::{check, Symbol};
 /// let quantity = Asset::from_amount(10000, Symbol::from("4,FOO"));
 /// assert_eq!(10000, quantity.amount);
 /// ```
-#[derive(std::cmp::Eq, Copy, Clone, Debug, Default)]
+#[derive(Eq, Copy, Clone, Debug, Default)]
 pub struct Asset {
     pub amount: i64,
     pub symbol: Symbol,
@@ -69,12 +67,24 @@ impl Asset {
     }
 }
 
-// impl Display for Asset {
-//     #[inline]
-//     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-//         f.write_str(format!("{}@{}", self.sym, self.contract).as_str())
-//     }
-// }
+impl std::fmt::Display for Asset {
+    /**
+     * Converts the asset into string
+     *
+     * @return String in the form of "1.2345 SYM" format, where SYM symbol has precision equal to 4
+     */
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let precision = self.symbol.precision();
+        let int_part = self.amount / 10_i64.pow(precision.into());
+        let dec_part = (self.amount % 10_i64.pow(precision.into())).abs();
+
+        if precision == 0 {
+            write!(f, "{} {}", int_part, self.symbol.code())
+        } else {
+            write!(f, "{}.{:0pad$} {}", int_part, dec_part, self.symbol.code(), pad = precision.into())
+        }
+    }
+}
 
 // impl From<&str> for Asset {
 //     #[inline]
@@ -739,5 +749,29 @@ mod tests {
         };
 
         let _ = asset1 / asset2;
+    }
+
+    #[test]
+    fn test_to_string() {
+        assert_eq!(Asset::from_amount(10000, Symbol::from("4,SYM")).to_string(), "1.0000 SYM");
+        assert_eq!(Asset::from_amount(12345, Symbol::from("2,SYM")).to_string(), "123.45 SYM");
+        assert_eq!(Asset::from_amount(100, Symbol::from("0,SYM")).to_string(), "100 SYM");
+        assert_eq!(Asset::from_amount(-1000001, Symbol::from("4,SYM")).to_string(), "-100.0001 SYM");
+        assert_eq!(Asset::from_amount(0, Symbol::from("0,SYM")).to_string(), "0 SYM");
+        assert_eq!(Asset::from_amount(-100, Symbol::from("0,SYM")).to_string(), "-100 SYM");
+        assert_eq!(
+            Asset::from_amount(0, Symbol::from("18,SYMBOLL")).to_string(),
+            "0.000000000000000000 SYMBOLL"
+        );
+        assert_eq!(
+            Asset::from_amount(-1000000000000000000, Symbol::from("18,SYMBOLL")).to_string(),
+            "-1.000000000000000000 SYMBOLL"
+        );
+        println!("{}", Asset::from_amount(10000, Symbol::from("4,SYM")))
+    }
+
+    #[test]
+    fn test_display() {
+        println!("{}", Asset::from_amount(10000, Symbol::from("4,SYM")))
     }
 }
