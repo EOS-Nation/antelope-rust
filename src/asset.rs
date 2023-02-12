@@ -89,7 +89,7 @@ impl std::fmt::Display for Asset {
 impl From<&str> for Asset {
     fn from(s: &str) -> Self {
         let parts: Vec<&str> = s.split(' ').collect();
-        check(parts.len() == 2, &format!("invalid asset: {}", s));
+        check(parts.len() == 2, &format!("invalid asset: {s}"));
         let (amount_str, symbol_str) = (parts[0], parts[1]);
         let precision = match amount_str.find('.') {
             Some(idx) => (amount_str.len() - idx - 1) as u8,
@@ -97,7 +97,7 @@ impl From<&str> for Asset {
         };
         let amount = match amount_str.replace('.', "").parse::<i64>() {
             Ok(amount) => amount,
-            Err(_) => panic!("invalid asset: {}", s),
+            Err(_) => panic!("invalid asset: {s}"),
         };
         let symbol = Symbol::from_precision(SymbolCode::from(symbol_str), precision);
 
