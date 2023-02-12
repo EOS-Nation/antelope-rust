@@ -1,4 +1,4 @@
-use crate::{check, Symbol};
+use crate::{check, Symbol, SymbolCode};
 // use std::convert::From;
 /// The `Asset` struct represents a asset
 ///
@@ -86,18 +86,24 @@ impl std::fmt::Display for Asset {
     }
 }
 
-// impl From<&str> for Asset {
-//     #[inline]
-//     #[must_use]
-//     fn from(str: &str) -> Self {
-//         let parts = str.split('@').collect::<Vec<&str>>();
-//         check(parts.len() == 2, "invalid extended symbol format");
-//         let sym = Symbol::from(parts[0]);
-//         check(sym.is_valid(), "invalid symbol precision");
-//         let contract = Name::from(parts[1]);
-//         Asset::from_extended(sym, contract)
-//     }
-// }
+impl From<&str> for Asset {
+    fn from(s: &str) -> Self {
+        let parts: Vec<&str> = s.split(' ').collect();
+        check(parts.len() == 2, &format!("invalid asset: {}", s));
+        let (amount_str, symbol_str) = (parts[0], parts[1]);
+        let precision = match amount_str.find('.') {
+            Some(idx) => (amount_str.len() - idx - 1) as u8,
+            None => 0,
+        };
+        let amount = match amount_str.replace('.', "").parse::<i64>() {
+            Ok(amount) => amount,
+            Err(_) => panic!("invalid asset: {}", s),
+        };
+        let symbol = Symbol::from_precision(SymbolCode::from(symbol_str), precision);
+
+        Asset { amount, symbol }
+    }
+}
 
 impl AsRef<Asset> for Asset {
     #[inline]
@@ -754,6 +760,7 @@ mod tests {
     #[test]
     fn test_to_string() {
         assert_eq!(Asset::from_amount(10000, Symbol::from("4,SYM")).to_string(), "1.0000 SYM");
+        assert_eq!(Asset::from_amount(0, Symbol::from("4,SYM")).to_string(), "0.0000 SYM");
         assert_eq!(Asset::from_amount(12345, Symbol::from("2,SYM")).to_string(), "123.45 SYM");
         assert_eq!(Asset::from_amount(100, Symbol::from("0,SYM")).to_string(), "100 SYM");
         assert_eq!(Asset::from_amount(-1000001, Symbol::from("4,SYM")).to_string(), "-100.0001 SYM");
@@ -767,11 +774,24 @@ mod tests {
             Asset::from_amount(-1000000000000000000, Symbol::from("18,SYMBOLL")).to_string(),
             "-1.000000000000000000 SYMBOLL"
         );
-        println!("{}", Asset::from_amount(10000, Symbol::from("4,SYM")))
     }
 
     #[test]
     fn test_display() {
         println!("{}", Asset::from_amount(10000, Symbol::from("4,SYM")))
+    }
+
+    #[test]
+    fn test_from_string() {
+        assert_eq!(Asset::from_amount(10000, Symbol::from("4,SYM")), Asset::from("1.0000 SYM"));
+        assert_eq!(Asset::from_amount(100, Symbol::from("0,SYM")), Asset::from("100 SYM"));
+        assert_eq!(Asset::from_amount(12345, Symbol::from("2,SYM")), Asset::from("123.45 SYM"));
+        assert_eq!(Asset::from_amount(-1000001, Symbol::from("4,SYM")), Asset::from("-100.0001 SYM"));
+        assert_eq!(Asset::from_amount(0, Symbol::from("0,SYM")), Asset::from("0 SYM"));
+        assert_eq!(Asset::from_amount(0, Symbol::from("4,SYM")), Asset::from("0.0000 SYM"));
+        assert_eq!(
+            Asset::from_amount(-1000000000000000000, Symbol::from("18,SYMBOLL")),
+            Asset::from("-1.000000000000000000 SYMBOLL")
+        );
     }
 }
