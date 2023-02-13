@@ -19,3 +19,7 @@ proptest = "1.0.0"
 
 [package.metadata.playground]
 default-features = true
+
+# to use cargo cmd install cargo-cmd with `cargo install cargo-cmd` and run `cargo cmd check`
+[package.metadata.commands]
+check = "cargo fmt && cargo clippy -- -D warnings && cargo test"
