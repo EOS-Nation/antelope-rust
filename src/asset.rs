@@ -75,8 +75,9 @@ impl std::fmt::Display for Asset {
      */
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let precision = self.symbol.precision();
-        let int_part = self.amount / 10_i64.pow(precision.into());
-        let dec_part = (self.amount % 10_i64.pow(precision.into())).abs();
+        let decimals = 10_i64.pow(precision.into());
+        let int_part = self.amount / decimals;
+        let dec_part = (self.amount % decimals).abs();
 
         if precision == 0 {
             write!(f, "{} {}", int_part, self.symbol.code())
