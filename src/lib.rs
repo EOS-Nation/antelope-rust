@@ -45,6 +45,10 @@ pub use self::name::*;
 pub mod asset;
 pub use self::asset::*;
 
+/// Modules for Asset type.
+pub mod extended_asset;
+pub use self::extended_asset::*;
+
 /// Modules for common library type.
 pub mod eosiolib;
 pub use self::eosiolib::*;
