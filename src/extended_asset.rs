@@ -92,6 +92,14 @@ impl std::fmt::Display for ExtendedAsset {
     }
 }
 
+impl AsRef<ExtendedAsset> for ExtendedAsset {
+    #[inline]
+    #[must_use]
+    fn as_ref(&self) -> &ExtendedAsset {
+        self
+    }
+}
+
 impl std::cmp::PartialEq for ExtendedAsset {
     fn eq(&self, other: &ExtendedAsset) -> bool {
         check(self.contract == other.contract, "type mismatch");
@@ -110,6 +118,176 @@ impl std::cmp::Ord for ExtendedAsset {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         check(self.contract == other.contract, "type mismatch");
         self.quantity.cmp(&other.quantity)
+    }
+}
+
+impl std::ops::SubAssign for ExtendedAsset {
+    /**
+     * Subtraction assignment operator
+     *
+     * @param other - Another extended asset to subtract this extended asset with
+     * @post The amount of this extended asset is subtracted by the amount of extended asset `other`
+     */
+    fn sub_assign(&mut self, other: ExtendedAsset) {
+        check(self.contract == other.contract, "type mismatch");
+        self.quantity -= other.quantity;
+    }
+}
+
+impl std::ops::AddAssign for ExtendedAsset {
+    /**
+     * Addition assignment operator
+     *
+     * @param other - Another extended asset to add this extended asset with
+     * @post The amount of this extended asset is subtracted by the amount of extended asset `other`
+     */
+    fn add_assign(&mut self, other: ExtendedAsset) {
+        check(self.contract == other.contract, "type mismatch");
+        self.quantity += other.quantity;
+    }
+}
+
+impl std::ops::MulAssign<i64> for ExtendedAsset {
+    /**
+     * Multiplication assignment operator, with a number
+     *
+     * @details Multiplication assignment operator. Multiply the amount of this asset with a number and then assign the value to itself.
+     * @param a - The multiplier for the asset's amount
+     * @return asset - Reference to this asset
+     * @post The amount of this asset is multiplied by a
+     */
+    fn mul_assign(&mut self, a: i64) {
+        self.quantity *= a;
+    }
+}
+
+impl std::ops::DivAssign<i64> for ExtendedAsset {
+    /**
+     * Division assignment operator, with a number proceeding
+     *
+     * @brief Division assignment operator, with a number proceeding
+     * @param self - The asset to be divided
+     * @param a - The divisor for the asset's amount
+     * @return asset - Reference to the asset, which has been divided
+     */
+    fn div_assign(&mut self, a: i64) {
+        self.quantity /= a;
+    }
+}
+
+impl std::ops::Neg for ExtendedAsset {
+    type Output = ExtendedAsset;
+    /**
+     * Negate the amount of the asset
+     *
+     * @return a new asset with the negated amount
+     */
+    fn neg(self) -> ExtendedAsset {
+        ExtendedAsset {
+            quantity: -self.quantity,
+            contract: self.contract,
+        }
+    }
+}
+
+impl std::ops::Add for ExtendedAsset {
+    type Output = Self;
+
+    /**
+     * Addition operator
+     *
+     * @param other - The second asset to be added to the first asset
+     * @return asset - New asset as the result of addition
+     */
+    fn add(self, other: Self) -> Self {
+        check(self.contract == other.contract, "type mismatch");
+        let mut result = self;
+        result += other;
+        result
+    }
+}
+
+impl std::ops::Sub for ExtendedAsset {
+    type Output = Self;
+
+    /**
+     * Addition operator
+     *
+     * @param other - The second asset to be added to the first asset
+     * @return asset - New asset as the result of addition
+     */
+    fn sub(self, other: Self) -> Self {
+        check(self.contract == other.contract, "type mismatch");
+        let mut result = self;
+        result -= other;
+        result
+    }
+}
+
+impl std::ops::Mul<i64> for ExtendedAsset {
+    type Output = ExtendedAsset;
+
+    /**
+     * Multiplication operator, with a number proceeding
+     *
+     * @brief Multiplication operator, with a number proceeding
+     * @param a - The asset to be multiplied
+     * @param b - The multiplier for the asset's amount
+     * @return asset - New asset as the result of multiplication
+     */
+    fn mul(self, b: i64) -> ExtendedAsset {
+        let mut result = self;
+        result *= b;
+        result
+    }
+}
+
+impl std::ops::Mul<ExtendedAsset> for i64 {
+    type Output = ExtendedAsset;
+
+    /**
+     * Multiplication operator, with a number preceeding
+     *
+     * @param a - The multiplier for the asset's amount
+     * @param b - The asset to be multiplied
+     * @return asset - New asset as the result of multiplication
+     */
+    fn mul(self, a: ExtendedAsset) -> ExtendedAsset {
+        a * self
+    }
+}
+
+impl std::ops::Div<i64> for ExtendedAsset {
+    type Output = ExtendedAsset;
+
+    /**
+     * Division operator, with a number proceeding
+     *
+     * @param a - The asset to be divided
+     * @param b - The divisor for the asset's amount
+     * @return asset - New asset as the result of division
+     */
+    fn div(self, b: i64) -> ExtendedAsset {
+        let mut result = self;
+        result /= b;
+        result
+    }
+}
+
+impl std::ops::Div<ExtendedAsset> for ExtendedAsset {
+    type Output = i64;
+
+    /**
+     * Division operator, with another asset
+     *
+     * @param a - The asset which amount acts as the dividend
+     * @param b - The asset which amount acts as the divisor
+     * @return int64_t - the resulted amount after the division
+     * @pre Both asset must have the same symbol
+     */
+    fn div(self, other: ExtendedAsset) -> Self::Output {
+        check(self.contract == other.contract, "type mismatch");
+        self.quantity / other.quantity
     }
 }
 
@@ -253,5 +431,98 @@ mod tests {
             "0 @contract"
         );
         assert_eq!(ExtendedAsset::from_asset(Asset::default(), Name::default()).to_string(), "0 @");
+    }
+
+    #[test]
+    fn test_sub_assign() {
+        let mut asset1 = ExtendedAsset::from_amount(10000, ExtendedSymbol::from("4,SYM@contract"));
+        let asset2 = ExtendedAsset::from_amount(20000, ExtendedSymbol::from("4,SYM@contract"));
+        asset1 -= asset2;
+
+        assert_eq!(asset1.quantity.amount, -10000);
+    }
+
+    #[test]
+    fn test_add_assign() {
+        let mut asset1 = ExtendedAsset::from_amount(10000, ExtendedSymbol::from("4,SYM@contract"));
+        let asset2 = ExtendedAsset::from_amount(20000, ExtendedSymbol::from("4,SYM@contract"));
+        asset1 += asset2;
+
+        assert_eq!(asset1.quantity.amount, 30000);
+        assert_eq!(asset1.to_string(), "3.0000 SYM@contract");
+    }
+
+    #[test]
+    fn test_mul_assign() {
+        let mut asset1 = ExtendedAsset::from_amount(10000, ExtendedSymbol::from("4,SYM@contract"));
+        asset1 /= 2;
+
+        assert_eq!(asset1.quantity.amount, 5000);
+        assert_eq!(asset1.to_string(), "0.5000 SYM@contract");
+    }
+
+    #[test]
+    fn test_div_assign() {
+        let mut asset1 = ExtendedAsset::from_amount(10000, ExtendedSymbol::from("4,SYM@contract"));
+        asset1 *= 2;
+
+        assert_eq!(asset1.quantity.amount, 20000);
+        assert_eq!(asset1.to_string(), "2.0000 SYM@contract");
+    }
+
+    #[test]
+    fn test_neg() {
+        let mut asset1 = ExtendedAsset::from_amount(10000, ExtendedSymbol::from("4,SYM@contract"));
+        asset1 = -asset1;
+
+        assert_eq!(asset1.quantity.amount, -10000);
+        assert_eq!(asset1.to_string(), "-1.0000 SYM@contract");
+    }
+
+    #[test]
+    fn test_add_operator() {
+        let asset1 = ExtendedAsset::from_amount(10000, ExtendedSymbol::from("4,SYM@contract"));
+        let asset2 = ExtendedAsset::from_amount(20000, ExtendedSymbol::from("4,SYM@contract"));
+
+        let result = asset1 + asset2;
+        assert_eq!(result.quantity.amount, 30000);
+        assert_eq!(result.to_string(), "3.0000 SYM@contract");
+    }
+
+    #[test]
+    fn test_sub_operator() {
+        let asset1 = ExtendedAsset::from_amount(10000, ExtendedSymbol::from("4,SYM@contract"));
+        let asset2 = ExtendedAsset::from_amount(20000, ExtendedSymbol::from("4,SYM@contract"));
+
+        let result = asset1 - asset2;
+        assert_eq!(result.quantity.amount, -10000);
+        assert_eq!(result.to_string(), "-1.0000 SYM@contract");
+    }
+
+    #[test]
+    fn test_div_operator() {
+        let asset1 = ExtendedAsset::from_amount(10000, ExtendedSymbol::from("4,SYM@contract"));
+        let asset2 = ExtendedAsset::from_amount(20000, ExtendedSymbol::from("4,SYM@contract"));
+
+        let result = asset2 / asset1;
+        assert_eq!(result, 2);
+    }
+
+    #[test]
+    fn test_mul_operator() {
+        let asset1 = ExtendedAsset::from_amount(10000, ExtendedSymbol::from("4,SYM@contract"));
+
+        let result = asset1 * 2;
+        assert_eq!(result.quantity.amount, 20000);
+        assert_eq!(result.to_string(), "2.0000 SYM@contract");
+    }
+
+    #[test]
+    fn test_div_operator2() {
+        let asset1 = ExtendedAsset::from_amount(10000, ExtendedSymbol::from("4,SYM@contract"));
+
+        let result = asset1 / 2;
+        assert_eq!(result.quantity.amount, 5000);
+        assert_eq!(result.to_string(), "0.5000 SYM@contract");
     }
 }
