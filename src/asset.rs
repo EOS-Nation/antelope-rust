@@ -88,6 +88,10 @@ impl std::fmt::Display for Asset {
 }
 
 impl From<&str> for Asset {
+    /**
+     * Parse Asset from string formatted as "1.2345 SYM@contract"
+     *
+     */
     fn from(s: &str) -> Self {
         let parts: Vec<&str> = s.split(' ').collect();
         check(parts.len() == 2, &format!("invalid asset: {s}"));

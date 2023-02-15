@@ -92,6 +92,23 @@ impl std::fmt::Display for ExtendedAsset {
     }
 }
 
+impl From<&str> for ExtendedAsset {
+    /**
+     * Parse ExtendedAsset from string formatted as "1.2345 SYM@contract"
+     *
+     */
+    fn from(s: &str) -> Self {
+        let parts: Vec<&str> = s.split('@').collect();
+
+        check(parts.len() == 2, "invalid extended asset format");
+
+        let quantity_str = parts[0];
+        let contract_str = parts[1];
+
+        ExtendedAsset::from_asset(Asset::from(quantity_str), Name::from(contract_str))
+    }
+}
+
 impl AsRef<ExtendedAsset> for ExtendedAsset {
     #[inline]
     #[must_use]
@@ -551,5 +568,31 @@ mod tests {
         let b = ExtendedAsset::from_amount(200, ExtendedSymbol::from_extended(Symbol::from("4,SYM"), Name::from("contract2")));
 
         let _ = a / b;
+    }
+
+    #[test]
+    fn test_from_str() {
+        let expected = ExtendedAsset {
+            quantity: Asset::from_amount(1_0000, Symbol::from("4,SYM")),
+            contract: Name::from("contract"),
+        };
+        let actual = ExtendedAsset::from("1.0000 SYM@contract");
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_from_str2() {
+        let expected = ExtendedAsset {
+            quantity: Asset::from_amount(1_0000, Symbol::from("4,SYM")),
+            contract: Name::default(),
+        };
+        let actual = ExtendedAsset::from("1.0000 SYM@");
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    #[should_panic(expected = "invalid extended asset format")]
+    fn test_from_str_with_invalid_input() {
+        let _ = ExtendedAsset::from("1.0000SYM");
     }
 }
