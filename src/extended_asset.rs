@@ -62,6 +62,8 @@ impl ExtendedAsset {
      *
      * @return extended_symbol - The extended symbol of the asset
      */
+    #[inline]
+    #[must_use]
     pub fn get_extended_symbol(&self) -> ExtendedSymbol {
         ExtendedSymbol::from_extended(self.quantity.symbol, self.contract)
     }
@@ -72,8 +74,21 @@ impl ExtendedAsset {
      * @return true - if the extended asset is valid
      * @return false - otherwise
      */
+    #[inline]
+    #[must_use]
     pub fn is_valid(&self) -> bool {
         self.quantity.is_valid() && self.contract.raw() != 0
+    }
+}
+
+impl std::fmt::Display for ExtendedAsset {
+    /**
+     * Converts the extended asset into string
+     *
+     * @return String in the form of "1.2345 SYM@contract" format
+     */
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{}@{}", self.quantity, self.contract)
     }
 }
 
@@ -217,5 +232,26 @@ mod tests {
         assert!(!ExtendedAsset::from_asset(Asset::from_amount(1234567, Symbol::from("4,SYM")), Name::new()).is_valid());
         assert!(!ExtendedAsset::from_asset(Asset::new(), Name::from("contract")).is_valid());
         assert!(!ExtendedAsset::from_asset(Asset::default(), Name::default()).is_valid());
+    }
+
+    #[test]
+    fn test_to_string() {
+        assert_eq!(
+            ExtendedAsset::from_amount(10000, ExtendedSymbol::from("4,SYM@contract")).to_string(),
+            "1.0000 SYM@contract"
+        );
+        assert_eq!(
+            ExtendedAsset::from_amount(0, ExtendedSymbol::from("4,SYM@contract")).to_string(),
+            "0.0000 SYM@contract"
+        );
+        assert_eq!(
+            ExtendedAsset::from_amount(1, ExtendedSymbol::from("0,SYM@contract")).to_string(),
+            "1 SYM@contract"
+        );
+        assert_eq!(
+            ExtendedAsset::from_asset(Asset::new(), Name::from("contract")).to_string(),
+            "0 @contract"
+        );
+        assert_eq!(ExtendedAsset::from_asset(Asset::default(), Name::default()).to_string(), "0 @");
     }
 }
