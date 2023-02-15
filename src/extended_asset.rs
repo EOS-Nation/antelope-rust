@@ -65,6 +65,16 @@ impl ExtendedAsset {
     pub fn get_extended_symbol(&self) -> ExtendedSymbol {
         ExtendedSymbol::from_extended(self.quantity.symbol, self.contract)
     }
+
+    /**
+     * Check if the extended asset is valid. %A valid extended asset has valid quantity and contract
+     *
+     * @return true - if the extended asset is valid
+     * @return false - otherwise
+     */
+    pub fn is_valid(&self) -> bool {
+        self.quantity.is_valid() && self.contract.raw() != 0
+    }
 }
 
 impl std::cmp::PartialEq for ExtendedAsset {
@@ -198,5 +208,14 @@ mod tests {
         assert!(b >= c);
         assert!(a < b);
         assert!(c <= b);
+    }
+
+    #[test]
+    fn test_is_valid() {
+        assert!(ExtendedAsset::from_amount(100, ExtendedSymbol::from("4,SYM@contract")).is_valid());
+        assert!(ExtendedAsset::from_asset(Asset::from_amount(1234567, Symbol::from("4,SYM")), Name::from("contract")).is_valid());
+        assert!(!ExtendedAsset::from_asset(Asset::from_amount(1234567, Symbol::from("4,SYM")), Name::new()).is_valid());
+        assert!(!ExtendedAsset::from_asset(Asset::new(), Name::from("contract")).is_valid());
+        assert!(!ExtendedAsset::from_asset(Asset::default(), Name::default()).is_valid());
     }
 }
