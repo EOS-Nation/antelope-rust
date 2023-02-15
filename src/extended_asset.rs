@@ -525,4 +525,31 @@ mod tests {
         assert_eq!(result.quantity.amount, 5000);
         assert_eq!(result.to_string(), "0.5000 SYM@contract");
     }
+
+    #[test]
+    #[should_panic(expected = "type mismatch")]
+    fn test_add_panic() {
+        let a = ExtendedAsset::from_amount(100, ExtendedSymbol::from_extended(Symbol::from("4,SYM"), Name::from("contract1")));
+        let b = ExtendedAsset::from_amount(200, ExtendedSymbol::from_extended(Symbol::from("4,SYM"), Name::from("contract2")));
+
+        let _ = a + b;
+    }
+
+    #[test]
+    #[should_panic(expected = "type mismatch")]
+    fn test_sub_panic() {
+        let a = ExtendedAsset::from_amount(100, ExtendedSymbol::from_extended(Symbol::from("4,SYM"), Name::from("contract1")));
+        let b = ExtendedAsset::from_amount(200, ExtendedSymbol::from_extended(Symbol::from("4,SYM"), Name::from("contract2")));
+
+        let _ = a - b;
+    }
+
+    #[test]
+    #[should_panic(expected = "type mismatch")]
+    fn test_div_panic() {
+        let a = ExtendedAsset::from_amount(100, ExtendedSymbol::from_extended(Symbol::from("4,SYM"), Name::from("contract1")));
+        let b = ExtendedAsset::from_amount(200, ExtendedSymbol::from_extended(Symbol::from("4,SYM"), Name::from("contract2")));
+
+        let _ = a / b;
+    }
 }
