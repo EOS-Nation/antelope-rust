@@ -72,16 +72,12 @@ impl Name {
     }
 
     /// Converts a character to a symbol.
-    #[must_use]
-    fn char_to_value(c: char) -> Option<u8> {
-        if c == '.' {
-            Some(0)
-        } else if ('1'..='5').contains(&c) {
-            Some(c as u8 - b'1' + 1)
-        } else if ('a'..='z').contains(&c) {
-            Some(c as u8 - b'a' + 6)
-        } else {
-            None
+    fn char_to_value(c: char) -> u8 {
+        match c {
+            '.' => 0,
+            '1'..='5' => c as u8 - b'1' + 1,
+            'a'..='z' => c as u8 - b'a' + 6,
+            _ => panic!("character is not in allowed character set for names"),
         }
     }
 
@@ -159,7 +155,7 @@ impl Name {
 }
 
 #[must_use]
-pub fn name_to_bytes(value: u64) -> [u8; NAME_MAX_LEN] {
+fn name_to_bytes(value: u64) -> [u8; NAME_MAX_LEN] {
     let mut chars = [b'.'; NAME_MAX_LEN];
     if value == 0 {
         return chars;
@@ -190,41 +186,22 @@ impl fmt::Display for Name {
 impl From<&str> for Name {
     fn from(str: &str) -> Self {
         let mut value = 0_u64;
-        let mut len = 0_u64;
-        let mut iter = str.bytes();
 
-        // Loop through up to 12 characters
-        for c in iter.by_ref() {
-            let v = Name::char_to_value(c as char);
-            check(v.is_some(), "name contains invalid character");
+        check(str.len() <= 13, "string is too long to be a valid name");
+        if str.is_empty() {
+            return Self { value };
+        }
+
+        let n = std::cmp::min(str.len(), 12);
+        for i in 0..n {
             value <<= 5;
-            value |= u64::from(v.unwrap());
-            len += 1;
-
-            if len == 12 {
-                break;
-            }
+            value |= Name::char_to_value(str.chars().nth(i).unwrap()) as u64;
         }
-
-        if len == 0 {
-            return Self { value: 0 };
-        }
-
-        value <<= 4 + 5 * (12 - len);
-
-        // Check if we have a 13th character
-        if let Some(c) = iter.next() {
-            let v = Name::char_to_value(c as char);
-            check(v.is_some(), "name contains invalid character");
-            let v = v.unwrap();
-            // The 13th character can only be 4 bits, it has to be between letters
-            // 'a' to 'j'
-            check(v <= 0x0F, "name contains invalid character");
-
-            value |= u64::from(v);
-
-            // Check if we have more than 13 characters
-            check(iter.next().is_none(), "name is too long");
+        value <<= (4 + 5 * (12 - n));
+        if str.len() == 13 {
+            let v = Name::char_to_value(str.chars().nth(12).unwrap());
+            check(v <= 0x0F, "thirteenth character in name cannot be a letter that comes after j");
+            value |= v as u64;
         }
 
         Self { value }
@@ -531,26 +508,20 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     #[allow(unused)]
     #[should_panic(expected = "character is not in allowed character set for names")]
     fn test_cdt_panic_1() {
-        Name::from("-1");
         Name::from("0");
-        Name::from("6");
     }
 
     #[test]
-    #[ignore]
     #[allow(unused)]
     #[should_panic(expected = "thirteenth character in name cannot be a letter that comes after j")]
     fn test_cdt_panic_2() {
         Name::from("111111111111k");
-        Name::from("zzzzzzzzzzzzk");
     }
 
     #[test]
-    #[ignore]
     #[allow(unused)]
     #[should_panic(expected = "string is too long to be a valid name")]
     fn test_cdt_panic_3() {
@@ -558,7 +529,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     #[allow(unused)]
     #[should_panic(expected = "character is not in allowed character set for names")]
     fn test_cdt_panic_4() {
@@ -572,7 +542,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     #[allow(unused)]
     #[should_panic(expected = "string is too long to be a valid name")]
     fn test_cdt_panic_5() {
@@ -620,6 +589,12 @@ mod tests {
         }
         #[test]
         fn random_names_with_dot(input in "[[1-5][a-z]]{1,5}[.]{0,1}[1-5][a-z]{1,5}") {
+            let name = Name::from(input.as_str());
+            prop_assert_eq!(name.to_string(), input);
+        }
+        #[test]
+        #[should_panic(expected = "character is not in allowed character set for names")]
+        fn bad_chars(input in "[[A-Z][6-9][!@#$%^&*()💔]]{1}") {
             let name = Name::from(input.as_str());
             prop_assert_eq!(name.to_string(), input);
         }
