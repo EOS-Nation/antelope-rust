@@ -14,52 +14,55 @@ body:
     validations:
       required: true
   - type: textarea
-    id: custom
+    id: constructors
     attributes:
       label: "Custom Antelope Types"
-      description: Please enter the list of custom types to be supported
+      description: Please enter the list of constructors to be supported
       value: |
-        - [ ] length
-        - [ ] is_valid
-        - [ ] raw
+        - [ ] new()
+        - [ ] default()
+        - [ ] from()
     validations:
       required: true
 
   - type: textarea
-    id: standard
+    id: constructors
     attributes:
-      label: "Standard Rust Types"
-      description: Please enter the list of standard types to be supported
+      label: "Custom Antelope Methods"
+      description: Please enter the list of custom methods to be supported
       value: |
-        - [ ] `new`
-        - [ ] `as_ref`
-        - `AsBool`
-          - [ ] `as_bool`
-        - `std::marker::Copy`
-          - [ ] `Copy`
-        - `std::clone`
-          - [ ] `Clone`
-        - `std::fmt`
-          - [ ] `{Result, Formatter, Display}`
-        - `std::convert::From`
+        - [ ] length()
+        - [ ] is_valid()
+        - [ ] raw()
+        - [ ] to_string()
+    validations:
+      required: true
+
+  - type: textarea
+    id: common
+    attributes:
+      label: "Common Rust Traits"
+      description: Please enter the list of common Rust traits to be supported
+      value: |
+        - [ ] `AsRef`
+        - [ ] `AsBool`
+        - [ ] `Copy`
+        - [ ] `Clone`
+        - [ ] `Display`
           - [ ] `From<u64>`
-          - [ ] `From<String>`
           - [ ] `From<&str>`
-          - [ ] `From<MyType> for bool`
     validations:
       required: true
 
   - type: textarea
     id: operators
     attributes:
-      label: "Operators Rust Types"
+      label: "Operators"
       description: Please enter the list of [operators](https://doc.rust-lang.org/book/appendix-02-operators.html) types to be supported
       value: |
         - `PartialEq`
           - [ ] expr != expr
           - [ ] expr == expr
-        - `Not`
-          - [ ] expr!
         - `PartialOrd` (`partial_cmp` & `cmp`)
           - [ ] expr < expr
           - [ ] expr > expr
@@ -76,11 +79,11 @@ body:
         - `AddAssign`
           - [ ] var += expr
         - `Mul`
-          - [ ] expr * expr	
+          - [ ] expr * expr
         - `MulAssign`
           - [ ] var *= expr
         - `Div`
-          - [ ] expr / expr	
+          - [ ] expr / expr
         - `DivAssign`
           - [ ] var /= expr
     validations:
