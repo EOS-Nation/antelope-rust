@@ -3,7 +3,6 @@ use crate::{check, SymbolCode};
 use std::cmp::{Ord, PartialEq, PartialOrd};
 use std::convert::From;
 use std::fmt::{Display, Formatter, Result};
-use std::ops::Not;
 
 /// The `Symbol` struct represents a symbol
 ///
@@ -132,16 +131,6 @@ impl AsRef<Symbol> for Symbol {
     }
 }
 
-impl Not for Symbol {
-    type Output = bool;
-
-    #[inline]
-    #[must_use]
-    fn not(self) -> bool {
-        self.value == 0
-    }
-}
-
 impl From<Symbol> for bool {
     #[inline]
     #[must_use]
@@ -243,13 +232,9 @@ mod tests {
         // constexpr explicit operator bool()const
         assert_eq!(false, Symbol::from(0).into());
         assert_eq!(true, Symbol::from(1).into());
-        assert_eq!(true, !Symbol::from(0));
-        assert_eq!(false, !Symbol::from(1));
 
         assert_eq!(false, Symbol::from_precision(SymbolCode::from(""), 0).into());
         assert_eq!(true, Symbol::from_precision(SymbolCode::from("SYMBOLL"), 0).into());
-        assert_eq!(true, !Symbol::from_precision(SymbolCode::from(""), 0));
-        assert_eq!(false, !Symbol::from_precision(SymbolCode::from("SYMBOLL"), 0));
     }
 
     #[test]

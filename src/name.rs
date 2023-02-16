@@ -3,7 +3,6 @@ use core::str;
 use std::cmp::{Ord, Ordering, PartialEq, PartialOrd};
 use std::convert::From;
 use std::fmt;
-use std::ops::Not;
 
 use crate::check;
 
@@ -254,16 +253,6 @@ impl AsRef<Name> for Name {
     }
 }
 
-impl Not for Name {
-    type Output = bool;
-
-    #[inline]
-    #[must_use]
-    fn not(self) -> bool {
-        self.value == 0
-    }
-}
-
 impl From<Name> for bool {
     #[inline]
     #[must_use]
@@ -403,13 +392,9 @@ mod tests {
         // Note that I must be explicit about calling the operator because it is defined as `explicit`
         assert_eq!(false, Name::from(0).into());
         assert_eq!(true, Name::from(1).into());
-        assert_eq!(true, !Name::from(0));
-        assert_eq!(false, !Name::from(1));
 
         assert_eq!(false, Name::from("").into());
         assert_eq!(true, Name::from("1").into());
-        assert_eq!(true, !Name::from(""));
-        assert_eq!(false, !Name::from("1"));
 
         assert_eq!(true, false == Name::from(0).into());
     }

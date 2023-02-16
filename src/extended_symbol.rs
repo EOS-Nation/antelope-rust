@@ -2,7 +2,6 @@ use crate::{check, Name, Symbol};
 use std::cmp::{Ord, PartialEq, PartialOrd};
 use std::convert::From;
 use std::fmt::{Display, Formatter, Result};
-use std::ops::Not;
 
 /// The `ExtendedSymbol` struct represents an extended symbol
 ///
@@ -86,16 +85,6 @@ impl AsRef<ExtendedSymbol> for ExtendedSymbol {
     #[must_use]
     fn as_ref(&self) -> &ExtendedSymbol {
         self
-    }
-}
-
-impl Not for ExtendedSymbol {
-    type Output = bool;
-
-    #[inline]
-    #[must_use]
-    fn not(self) -> bool {
-        self.contract.raw() == 0 && self.sym.raw() == 0
     }
 }
 

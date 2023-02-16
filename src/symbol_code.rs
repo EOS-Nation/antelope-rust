@@ -2,7 +2,6 @@ use crate::check;
 use std::cmp::{Ord, PartialEq, PartialOrd};
 use std::convert::From;
 use std::fmt::{Display, Formatter, Result};
-use std::ops::Not;
 
 /// The `SymbolCode` struct represents a symbol code
 ///
@@ -211,16 +210,6 @@ impl AsRef<SymbolCode> for SymbolCode {
     }
 }
 
-impl Not for SymbolCode {
-    type Output = bool;
-
-    #[inline]
-    #[must_use]
-    fn not(self) -> bool {
-        self.value == 0
-    }
-}
-
 impl From<SymbolCode> for bool {
     #[inline]
     #[must_use]
@@ -289,13 +278,9 @@ mod tests {
         // constexpr explicit operator bool()const
         assert_eq!(false, SymbolCode::from(0).into());
         assert_eq!(true, SymbolCode::from(1).into());
-        assert_eq!(true, !SymbolCode::from(0));
-        assert_eq!(false, !SymbolCode::from(1));
 
         assert_eq!(false, SymbolCode::from("").into());
         assert_eq!(true, SymbolCode::from("SYMBOL").into());
-        assert_eq!(true, !SymbolCode::from(""));
-        assert_eq!(false, !SymbolCode::from("SYMBOL"));
     }
 
     #[test]
