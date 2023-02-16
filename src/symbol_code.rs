@@ -481,6 +481,13 @@ mod tests {
         assert_eq!(SymbolCode::from(symcode), symcode);
     }
 
+    #[test]
+    fn test_to_bool() {
+        assert_eq!(true, SymbolCode::from("ABCDEFG").into());
+        assert_eq!(false, SymbolCode::default().into());
+        assert_eq!(false, SymbolCode::from("").into());
+    }
+
     proptest! {
         #[test]
         fn random_sym_codes(input in "[[A-Z]]{1,7}") {
