@@ -39,18 +39,34 @@ pub struct Name {
 }
 
 impl Name {
-    /// Creates a new name
+    /**
+     * Construct a new name
+     *
+     * @brief Construct a new name object defaulting to a value of 0
+     *
+     */
     #[must_use]
+    #[inline]
     pub fn new() -> Self {
         Self { value: 0 }
     }
 
+    /**
+     * Casts a name to raw
+     *
+     * @return Returns an instance of raw based on the value of a name
+     */
     #[must_use]
+    #[inline]
     pub fn raw(&self) -> u64 {
         self.value
     }
 
+    /**
+     *  Returns the length of the %name
+     */
     #[must_use]
+    #[inline]
     pub fn length(&self) -> u8 {
         let mask: u64 = 0xF800000000000000;
 
@@ -71,7 +87,12 @@ impl Name {
         l + 1
     }
 
-    /// Converts a character to a symbol.
+    /**
+     *  Converts a %name Base32 symbol into its corresponding value
+     *
+     *  @param c - Character to be converted
+     *  @return char - Converted value or panic
+     */
     fn char_to_value(c: char) -> u8 {
         match c {
             '.' => 0,
@@ -81,6 +102,9 @@ impl Name {
         }
     }
 
+    /**
+     *  Returns the prefix of the %name
+     */
     #[must_use]
     fn prefix(&self) -> Name {
         let mut result: u64 = self.value;
@@ -114,6 +138,10 @@ impl Name {
         Name::from(result)
     }
 
+    /**
+     *  Returns the suffix of the %name
+     */
+    #[must_use]
     fn suffix(&self) -> Name {
         let mut remaining_bits_after_last_actual_dot: u32 = 0;
         let mut tmp: u32 = 0;
@@ -175,6 +203,11 @@ fn name_to_bytes(value: u64) -> [u8; NAME_MAX_LEN] {
 }
 
 impl fmt::Display for Name {
+    /**
+     *  Returns the name as a string.
+     *
+     *  @brief Returns the name value as a string
+     */
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let bytes = name_to_bytes(self.value);
@@ -184,6 +217,13 @@ impl fmt::Display for Name {
 }
 
 impl From<&str> for Name {
+    /**
+     * Construct a new name given an string.
+     *
+     * @brief Construct a new name object initialising value with str
+     * @param str - The string value which validated then converted to unit64_t
+     *
+     */
     fn from(str: &str) -> Self {
         let mut value = 0_u64;
 
@@ -209,8 +249,14 @@ impl From<&str> for Name {
 }
 
 impl From<u64> for Name {
+    /**
+     * Construct a new name given a unit64_t value
+     *
+     * @brief Construct a new name object initialising value with v
+     * @param v - The unit64_t value
+     *
+     */
     #[inline]
-    #[must_use]
     fn from(value: u64) -> Self {
         Name { value }
     }
@@ -218,21 +264,25 @@ impl From<u64> for Name {
 
 impl From<Name> for u64 {
     #[inline]
-    #[must_use]
     fn from(name: Name) -> Self {
         name.value
     }
 }
 
 impl AsRef<Name> for Name {
+    #[inline]
     fn as_ref(&self) -> &Name {
         self
     }
 }
 
 impl From<Name> for bool {
+    /**
+     * Explicit cast to bool of the uint64_t value of the name
+     *
+     * @return Returns true if the name is set to the default value of 0 else true.
+     */
     #[inline]
-    #[must_use]
     fn from(name: Name) -> Self {
         name.raw() != 0
     }
