@@ -49,9 +49,6 @@ pub use self::asset::*;
 pub mod extended_asset;
 pub use self::extended_asset::*;
 
-/// Modules for common library type.
-pub mod eosiolib;
-pub use self::eosiolib::*;
-
+/// Modules for Microseconds type.
 pub mod microseconds;
 pub use self::microseconds::*;
