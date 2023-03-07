@@ -52,3 +52,7 @@ pub use self::extended_asset::*;
 /// Modules for Microseconds type.
 pub mod microseconds;
 pub use self::microseconds::*;
+
+/// Modules for TimePoint type.
+pub mod time_point;
+pub use self::time_point::*;
