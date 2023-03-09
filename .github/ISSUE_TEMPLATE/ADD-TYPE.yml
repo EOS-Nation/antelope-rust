@@ -49,8 +49,8 @@ body:
         - [ ] `Copy`
         - [ ] `Clone`
         - [ ] `Display`
-          - [ ] `From<u64>`
-          - [ ] `From<&str>`
+        - [ ] `From<u64>`
+        - [ ] `From<&str>`
     validations:
       required: true
 
@@ -61,31 +61,31 @@ body:
       description: Please enter the list of [operators](https://doc.rust-lang.org/book/appendix-02-operators.html) types to be supported
       value: |
         - `PartialEq`
-          - [ ] expr != expr
-          - [ ] expr == expr
+          - [ ] self != self
+          - [ ] self == self
         - `PartialOrd` (`partial_cmp` & `cmp`)
-          - [ ] expr < expr
-          - [ ] expr > expr
-          - [ ] expr <= expr
-          - [ ] expr >= expr
+          - [ ] self < self
+          - [ ] self > self
+          - [ ] self <= self
+          - [ ] self >= self
         - `Neg`
-          - [ ] - expr
+          - [ ] - self
         - `Sub`
-          - [ ] expr - expr
+          - [ ] self - self
         - `SubAssign`
-          - [ ] var -= expr
+          - [ ] self -= self
         - `Add`
-          - [ ] expr + expr
+          - [ ] self + self
         - `AddAssign`
-          - [ ] var += expr
+          - [ ] self += self
         - `Mul`
-          - [ ] expr * expr
+          - [ ] self * other
         - `MulAssign`
-          - [ ] var *= expr
+          - [ ] self *= other
         - `Div`
-          - [ ] expr / expr
+          - [ ] self / other
         - `DivAssign`
-          - [ ] var /= expr
+          - [ ] self /= other
     validations:
       required: true
 
