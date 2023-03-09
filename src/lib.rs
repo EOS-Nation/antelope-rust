@@ -56,3 +56,7 @@ pub use self::microseconds::*;
 /// Modules for TimePoint type.
 pub mod time_point;
 pub use self::time_point::*;
+
+/// Modules for TimePoint type.
+pub mod time_point_sec;
+pub use self::time_point_sec::*;
