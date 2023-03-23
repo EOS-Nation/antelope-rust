@@ -1,6 +1,6 @@
 use chrono::{TimeZone, Utc};
 
-use crate::Microseconds;
+use crate::{Microseconds, TimePointSec};
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Eq, Ord, Default)]
 pub struct TimePoint {
@@ -34,6 +34,12 @@ impl From<Microseconds> for TimePoint {
     #[must_use]
     fn from(elapsed: Microseconds) -> Self {
         TimePoint { elapsed }
+    }
+}
+
+impl From<TimePointSec> for TimePoint {
+    fn from(tps: TimePointSec) -> Self {
+        TimePoint::from(crate::seconds(tps.sec_since_epoch() as i64))
     }
 }
 
@@ -111,6 +117,13 @@ impl std::ops::Add<Microseconds> for TimePoint {
     type Output = Self;
     fn add(self, other: Microseconds) -> Self {
         TimePoint::from(self.elapsed + other)
+    }
+}
+
+impl std::ops::Sub<TimePointSec> for TimePoint {
+    type Output = Self;
+    fn sub(self, other: TimePointSec) -> Self {
+        self - TimePoint::from(other)
     }
 }
 
