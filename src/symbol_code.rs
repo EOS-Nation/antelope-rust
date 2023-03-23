@@ -108,7 +108,7 @@ impl SymbolCode {
         let mut i = 0;
         while i < 7 {
             let c = sym as u8 as char;
-            if !('A'..='Z').contains(&c) {
+            if !c.is_ascii_uppercase() {
                 return false;
             }
             sym >>= 8;
@@ -178,7 +178,7 @@ impl From<&str> for SymbolCode {
         let mut value: u64 = 0;
         check(str.len() <= 7, "string is too long to be a valid symbol_code");
         for c in str.chars().rev() {
-            check(('A'..='Z').contains(&c), "only uppercase letters allowed in symbol_code string");
+            check(c.is_ascii_uppercase(), "only uppercase letters allowed in symbol_code string");
             value <<= 8;
             value |= c as u64;
         }
