@@ -32,7 +32,7 @@ impl TimePointSec {
     pub fn from_iso_string(str: &str) -> Self {
         let dt = Utc.datetime_from_str(str, "%Y-%m-%dT%H:%M:%S").expect("date parsing failed");
         let seconds: u32 = dt.timestamp().try_into().unwrap_or_else(|_| {
-            panic!("{} is out of range for TimePointSec", str);
+            panic!("{str} is out of range for TimePointSec");
         });
         TimePointSec::from(seconds)
     }
@@ -58,7 +58,7 @@ impl std::fmt::Display for TimePointSec {
      */
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let ts = crate::TimePoint::from(*self);
-        write!(f, "{}", ts)
+        write!(f, "{ts}")
     }
 }
 

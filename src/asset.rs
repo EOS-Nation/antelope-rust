@@ -65,6 +65,13 @@ impl Asset {
         self.amount = amount;
         check(self.is_amount_within_range(), "magnitude of asset amount must be less than 2^62")
     }
+
+    /**
+     * @return float value of amount
+     */
+    pub fn value(&self) -> f64 {
+        self.amount as f64 / 10_f64.powi(self.symbol.precision() as i32)
+    }
 }
 
 impl std::fmt::Display for Asset {
@@ -798,5 +805,11 @@ mod tests {
             Asset::from_amount(-1000000000000000000, Symbol::from("18,SYMBOLL")),
             Asset::from("-1.000000000000000000 SYMBOLL")
         );
+    }
+
+    #[test]
+    fn test_value() {
+        let sym = Symbol::from("4,SYM");
+        assert_eq!(Asset::from_amount(15000, sym).value(), 1.5);
     }
 }
