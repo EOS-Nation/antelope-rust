@@ -1,5 +1,3 @@
-// use chrono::{TimeZone, Utc};
-
 use crate::{Microseconds, TimePointSec};
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Eq, Ord, Default)]
@@ -22,11 +20,11 @@ impl TimePoint {
         self.elapsed.to_seconds() as u32
     }
 
-    // pub fn from_iso_string(str: &str) -> Self {
-    //     let dt = Utc.datetime_from_str(str, "%Y-%m-%dT%H:%M:%S").expect("date parsing failed");
+    pub fn from_iso_string(str: &str) -> Self {
+        let tps = TimePointSec::from_iso_string(str);
 
-    //     TimePoint::from(crate::seconds(dt.timestamp()))
-    // }
+        TimePoint::from(tps)
+    }
 }
 
 impl From<Microseconds> for TimePoint {
@@ -51,18 +49,18 @@ impl AsRef<TimePoint> for TimePoint {
     }
 }
 
-// impl std::fmt::Display for TimePoint {
-//     /**
-//      * Converts the TimePoint into string
-//      *
-//      * @return String in the form of "%Y-%m-%dT%H:%M:%S" format (e.g. "2018-03-21T13:08:08")
-//      */
-//     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-//         let dt = Utc.timestamp_opt(self.sec_since_epoch() as i64, 0).unwrap();
+impl std::fmt::Display for TimePoint {
+    /**
+     * Converts the TimePoint into string
+     *
+     * @return String in the form of "%Y-%m-%dT%H:%M:%S" format (e.g. "2018-03-21T13:08:08")
+     */
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let tps = TimePointSec::from(*self);
 
-//         write!(f, "{}", dt.format("%Y-%m-%dT%H:%M:%S"))
-//     }
-// }
+        write!(f, "{}", tps)
+    }
+}
 
 impl std::ops::AddAssign for TimePoint {
     fn add_assign(&mut self, other: Self) {
@@ -152,40 +150,40 @@ mod tests {
         assert_eq!(tp.sec_since_epoch(), 1234567);
     }
 
-    // #[test]
-    // fn test_display() {
-    //     assert_eq!(TimePoint::from(Microseconds::new()).to_string(), "1970-01-01T00:00:00");
-    //     assert_eq!(
-    //         TimePoint::from(Microseconds::from(897898392000000)).to_string(),
-    //         "1998-06-15T08:13:12"
-    //     );
-    //     assert_eq!(
-    //         TimePoint::from(Microseconds::from(2147483647000000)).to_string(),
-    //         "2038-01-19T03:14:07"
-    //     );
-    // }
+    #[test]
+    fn test_display() {
+        assert_eq!(TimePoint::from(Microseconds::new()).to_string(), "1970-01-01T00:00:00");
+        assert_eq!(
+            TimePoint::from(Microseconds::from(897898392000000)).to_string(),
+            "1998-06-15T08:13:12"
+        );
+        assert_eq!(
+            TimePoint::from(Microseconds::from(2147483647000000)).to_string(),
+            "2038-01-19T03:14:07"
+        );
+    }
 
-    // #[test]
-    // fn test_iso_string() {
-    //     assert_eq!(TimePoint::from_iso_string("1970-01-01T00:00:00").elapsed, Microseconds::new());
-    //     assert_eq!(TimePoint::from_iso_string("1998-06-15T08:13:12").elapsed.count(), 897898392000000);
-    //     assert_eq!(TimePoint::from_iso_string("2020-01-01T00:00:00").elapsed.count(), 1577836800000000);
-    //     assert_eq!(TimePoint::from_iso_string("2038-01-19T03:14:07").elapsed.count(), 2147483647000000);
-    //     assert_eq!(TimePoint::from_iso_string("1998-06-15T08:13:12").to_string(), "1998-06-15T08:13:12");
-    //     assert_eq!(TimePoint::from_iso_string("2038-01-19T03:14:07").to_string(), "2038-01-19T03:14:07");
-    // }
+    #[test]
+    fn test_iso_string() {
+        assert_eq!(TimePoint::from_iso_string("1970-01-01T00:00:00").elapsed, Microseconds::new());
+        assert_eq!(TimePoint::from_iso_string("1998-06-15T08:13:12").elapsed.count(), 897898392000000);
+        assert_eq!(TimePoint::from_iso_string("2020-01-01T00:00:00").elapsed.count(), 1577836800000000);
+        assert_eq!(TimePoint::from_iso_string("2038-01-19T03:14:07").elapsed.count(), 2147483647000000);
+        assert_eq!(TimePoint::from_iso_string("1998-06-15T08:13:12").to_string(), "1998-06-15T08:13:12");
+        assert_eq!(TimePoint::from_iso_string("2038-01-19T03:14:07").to_string(), "2038-01-19T03:14:07");
+    }
 
-    // #[test]
-    // #[should_panic(expected = "date parsing failed")]
-    // fn test_iso_string_panic() {
-    //     TimePoint::from_iso_string("invalid_string").elapsed.count();
-    // }
+    #[test]
+    #[should_panic(expected = "date parsing failed")]
+    fn test_iso_string_panic() {
+        TimePoint::from_iso_string("invalid_string").elapsed.count();
+    }
 
-    // #[test]
-    // #[should_panic(expected = "date parsing failed")]
-    // fn test_iso_string_panic2() {
-    //     TimePoint::from_iso_string("2010-13-81T00:00:00").elapsed.count();
-    // }
+    #[test]
+    #[should_panic(expected = "date parsing failed")]
+    fn test_iso_string_panic2() {
+        TimePoint::from_iso_string("2010-13-81T00:00:00").elapsed.count();
+    }
 
     #[test]
     fn test_eq() {

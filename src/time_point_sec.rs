@@ -3,7 +3,7 @@ use core::str;
 use std::cmp::{Ord, Ordering, PartialEq, PartialOrd};
 use std::convert::From;
 
-// use chrono::{TimeZone, Utc};
+use time::{format_description, OffsetDateTime};
 
 use crate::{check, Microseconds, TimePoint};
 
@@ -29,13 +29,12 @@ impl TimePointSec {
         self.utc_seconds
     }
 
-    // pub fn from_iso_string(str: &str) -> Self {
-    //     let dt = Utc.datetime_from_str(str, "%Y-%m-%dT%H:%M:%S").expect("date parsing failed");
-    //     let seconds: u32 = dt.timestamp().try_into().unwrap_or_else(|_| {
-    //         panic!("{str} is out of range for TimePointSec");
-    //     });
-    //     TimePointSec::from(seconds)
-    // }
+    pub fn from_iso_string(str: &str) -> Self {
+        let dt = OffsetDateTime::parse(format!("{}Z", str).as_str(), &format_description::well_known::Iso8601::DEFAULT)
+            .expect("date parsing failed");
+
+        TimePointSec::from(dt.unix_timestamp() as u32)
+    }
 }
 
 impl From<u32> for TimePointSec {
@@ -50,17 +49,18 @@ impl From<TimePoint> for TimePointSec {
     }
 }
 
-// impl std::fmt::Display for TimePointSec {
-//     /**
-//      * Converts the TimePointSec into string
-//      *
-//      * @return String in the form of "%Y-%m-%dT%H:%M:%S" format (e.g. "2018-03-21T13:08:08")
-//      */
-//     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-//         let ts = crate::TimePoint::from(*self);
-//         write!(f, "{ts}")
-//     }
-// }
+impl std::fmt::Display for TimePointSec {
+    /**
+     * Converts the TimePointSec into string
+     *
+     * @return String in the form of "%Y-%m-%dT%H:%M:%S" format (e.g. "2018-03-21T13:08:08")
+     */
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        let dt = OffsetDateTime::from_unix_timestamp(self.sec_since_epoch() as i64).expect("format failed");
+        let format = format_description::parse("[year]-[month]-[day]T[hour]:[minute]:[second]").unwrap();
+        write!(f, "{}", dt.format(&format).unwrap())
+    }
+}
 
 impl std::ops::AddAssign for TimePointSec {
     fn add_assign(&mut self, other: Self) {
@@ -209,33 +209,45 @@ mod tests {
         assert_eq!(time_point2.cmp(&time_point3), Ordering::Less);
     }
 
-    // #[test]
-    // fn test_iso_string() {
-    //     assert_eq!(TimePointSec::from_iso_string("1970-01-01T00:00:00").sec_since_epoch(), 0);
-    //     assert_eq!(TimePointSec::from_iso_string("1998-06-15T08:13:12").sec_since_epoch(), 897898392);
-    //     assert_eq!(TimePointSec::from_iso_string("2020-01-01T00:00:00").sec_since_epoch(), 1577836800);
-    //     assert_eq!(TimePointSec::from_iso_string("2038-01-19T03:14:07").sec_since_epoch(), 2147483647);
-    //     assert_eq!(
-    //         TimePointSec::from_iso_string("1998-06-15T08:13:12").to_string(),
-    //         "1998-06-15T08:13:12"
-    //     );
-    //     assert_eq!(
-    //         TimePointSec::from_iso_string("2038-01-19T03:14:07").to_string(),
-    //         "2038-01-19T03:14:07"
-    //     );
-    // }
+    #[test]
+    fn test_from_iso_string() {
+        assert_eq!(TimePointSec::from_iso_string("1970-01-01T00:00:00").sec_since_epoch(), 0);
+        assert_eq!(TimePointSec::from_iso_string("1998-06-15T08:13:12").sec_since_epoch(), 897898392);
+        assert_eq!(TimePointSec::from_iso_string("2020-01-01T00:00:00").sec_since_epoch(), 1577836800);
+        assert_eq!(TimePointSec::from_iso_string("2038-01-19T03:14:07").sec_since_epoch(), 2147483647);
+    }
 
-    // #[test]
-    // #[should_panic(expected = "date parsing failed")]
-    // fn test_iso_string_panic() {
-    //     TimePointSec::from_iso_string("invalid_string");
-    // }
+    #[test]
+    fn test_to_iso_string() {
+        assert_eq!(
+            TimePointSec::from_iso_string("1970-01-01T00:00:00").to_string(),
+            "1970-01-01T00:00:00"
+        );
+        assert_eq!(
+            TimePointSec::from_iso_string("1998-06-15T08:13:12").to_string(),
+            "1998-06-15T08:13:12"
+        );
+        assert_eq!(
+            TimePointSec::from_iso_string("2020-01-01T00:00:00").to_string(),
+            "2020-01-01T00:00:00"
+        );
+        assert_eq!(
+            TimePointSec::from_iso_string("2038-01-19T03:14:07").to_string(),
+            "2038-01-19T03:14:07"
+        );
+    }
 
-    // #[test]
-    // #[should_panic(expected = "date parsing failed")]
-    // fn test_iso_string_panic2() {
-    //     TimePointSec::from_iso_string("2010-13-81T00:00:00");
-    // }
+    #[test]
+    #[should_panic]
+    fn test_iso_string_panic() {
+        TimePointSec::from_iso_string("invalid_string");
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_iso_string_panic2() {
+        TimePointSec::from_iso_string("2010-13-81T00:00:00");
+    }
 
     #[test]
     fn test_add_assign_self() {
