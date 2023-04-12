@@ -30,7 +30,7 @@ impl TimePointSec {
     }
 
     pub fn from_iso_string(str: &str) -> Self {
-        let dt = OffsetDateTime::parse(format!("{}Z", str).as_str(), &format_description::well_known::Iso8601::DEFAULT)
+        let dt = OffsetDateTime::parse(format!("{str}Z").as_str(), &format_description::well_known::Iso8601::DEFAULT)
             .expect("date parsing failed");
 
         TimePointSec::from(dt.unix_timestamp() as u32)

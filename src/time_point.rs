@@ -58,7 +58,7 @@ impl std::fmt::Display for TimePoint {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let tps = TimePointSec::from(*self);
 
-        write!(f, "{}", tps)
+        write!(f, "{tps}")
     }
 }
 

@@ -93,7 +93,7 @@ impl Name {
      *  @param c - Character to be converted
      *  @return char - Converted value or panic
      */
-    fn char_to_value(c: char) -> u8 {
+    pub fn char_to_value(c: char) -> u8 {
         match c {
             '.' => 0,
             '1'..='5' => c as u8 - b'1' + 1,
@@ -106,7 +106,7 @@ impl Name {
      *  Returns the prefix of the %name
      */
     #[must_use]
-    fn prefix(&self) -> Name {
+    pub fn prefix(&self) -> Name {
         let mut result: u64 = self.value;
         let mut not_dot_character_seen: bool = false;
         let mut mask: u64 = 0xF;
@@ -142,7 +142,7 @@ impl Name {
      *  Returns the suffix of the %name
      */
     #[must_use]
-    fn suffix(&self) -> Name {
+    pub fn suffix(&self) -> Name {
         let mut remaining_bits_after_last_actual_dot: u32 = 0;
         let mut tmp: u32 = 0;
 
@@ -183,7 +183,7 @@ impl Name {
 }
 
 #[must_use]
-fn name_to_bytes(value: u64) -> [u8; NAME_MAX_LEN] {
+pub fn name_to_bytes(value: u64) -> [u8; NAME_MAX_LEN] {
     let mut chars = [b'.'; NAME_MAX_LEN];
     if value == 0 {
         return chars;
