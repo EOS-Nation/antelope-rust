@@ -24,9 +24,9 @@ pub const NAME_MAX_LEN: usize = 13;
 /// ```
 /// use antelope::Name;
 ///
-/// let account = Name::from("pinax");
-/// assert_eq!(12368694922654515200, account.value);
-/// assert_eq!("pinax", account.to_string());
+/// let account = Name::from("myaccount");
+/// assert_eq!(10920248689889378304, account.value);
+/// assert_eq!("myaccount", account.to_string());
 /// ```
 #[derive(Eq, Copy, Clone, Debug, PartialEq, PartialOrd, Ord, Default)]
 pub struct Name {
