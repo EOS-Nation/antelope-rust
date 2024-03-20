@@ -81,15 +81,18 @@ impl std::fmt::Display for Asset {
      * @return String in the form of "1.2345 SYM" format, where SYM symbol has precision equal to 4
      */
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        let precision = self.symbol.precision();
-        let decimals = 10_i64.pow(precision.into());
-        let int_part = self.amount / decimals;
-        let dec_part = (self.amount % decimals).abs();
+        let whole = self.amount / 10_i64.pow(self.symbol.precision().min(18) as u32);
 
-        if precision == 0 {
-            write!(f, "{} {}", int_part, self.symbol.code())
+        let decimal: String = (0..self.symbol.precision() as usize)
+            .rev()
+            .map(|i| (self.amount.abs() / 10_i64.pow(i.min(18) as u32)) % 10)
+            .map(|digit| (b'0' + (digit as u8)) as char)
+            .collect();
+
+        if decimal.is_empty() {
+            write!(f, "{} {}", whole, self.symbol.code())
         } else {
-            write!(f, "{}.{:0pad$} {}", int_part, dec_part, self.symbol.code(), pad = precision.into())
+            write!(f, "{}.{} {}", whole, decimal, self.symbol.code())
         }
     }
 }
@@ -152,12 +155,7 @@ impl std::cmp::PartialEq for Asset {
 
 impl std::cmp::PartialOrd for Asset {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        check(
-            self.symbol == other.symbol,
-            "comparison of assets with different symbols is not allowed",
-        );
-
-        self.amount.partial_cmp(&other.amount)
+        Some(self.cmp(other))
     }
 }
 
@@ -771,11 +769,11 @@ mod tests {
 
     #[test]
     fn test_to_string() {
+        assert_eq!(Asset::from_amount(-1000001, Symbol::from("4,SYM")).to_string(), "-100.0001 SYM");
         assert_eq!(Asset::from_amount(10000, Symbol::from("4,SYM")).to_string(), "1.0000 SYM");
         assert_eq!(Asset::from_amount(0, Symbol::from("4,SYM")).to_string(), "0.0000 SYM");
         assert_eq!(Asset::from_amount(12345, Symbol::from("2,SYM")).to_string(), "123.45 SYM");
         assert_eq!(Asset::from_amount(100, Symbol::from("0,SYM")).to_string(), "100 SYM");
-        assert_eq!(Asset::from_amount(-1000001, Symbol::from("4,SYM")).to_string(), "-100.0001 SYM");
         assert_eq!(Asset::from_amount(0, Symbol::from("0,SYM")).to_string(), "0 SYM");
         assert_eq!(Asset::from_amount(-100, Symbol::from("0,SYM")).to_string(), "-100 SYM");
         assert_eq!(
@@ -801,9 +799,15 @@ mod tests {
         assert_eq!(Asset::from_amount(-1000001, Symbol::from("4,SYM")), Asset::from("-100.0001 SYM"));
         assert_eq!(Asset::from_amount(0, Symbol::from("0,SYM")), Asset::from("0 SYM"));
         assert_eq!(Asset::from_amount(0, Symbol::from("4,SYM")), Asset::from("0.0000 SYM"));
+        assert_eq!(Asset::from_amount(1, Symbol::from("4,SYM")), Asset::from("0.0001 SYM"));
         assert_eq!(
             Asset::from_amount(-1000000000000000000, Symbol::from("18,SYMBOLL")),
             Asset::from("-1.000000000000000000 SYMBOLL")
+        );
+        // see: https://github.com/pinax-network/antelope.rs/issues/13
+        assert_eq!(
+            Asset::from_amount(10000000000001, Symbol::from("69,JIAYOUY")),
+            Asset::from("0.000000000000000000000000000000000000000000000000000000010000000000001 JIAYOUY")
         );
     }
 

@@ -126,8 +126,7 @@ impl std::cmp::PartialEq for ExtendedAsset {
 
 impl std::cmp::PartialOrd for ExtendedAsset {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        check(self.contract == other.contract, "type mismatch");
-        self.quantity.partial_cmp(&other.quantity)
+        Some(self.cmp(other))
     }
 }
 
