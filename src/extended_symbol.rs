@@ -1,7 +1,8 @@
-use crate::{check, Name, Symbol};
+use crate::{Name, ParseError, Symbol};
 use std::cmp::{Ord, PartialEq, PartialOrd};
 use std::convert::From;
-use std::fmt::{Display, Formatter, Result};
+use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
 /// The `ExtendedSymbol` struct represents an extended symbol
 ///
@@ -62,21 +63,40 @@ impl ExtendedSymbol {
 
 impl Display for ExtendedSymbol {
     #[inline]
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_str(format!("{}@{}", self.sym, self.contract).as_str())
     }
 }
 
+impl FromStr for ExtendedSymbol {
+    type Err = ParseError;
+
+    /**
+     * Parse ExtendedSymbol from string formatted as "4,SYM@contract"
+     *
+     */
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let parts: Vec<&str> = s.split('@').collect();
+        if parts.len() != 2 {
+            return Err(ParseError::BadFormat);
+        }
+
+        let symbol = match Symbol::from_str(parts[0]) {
+            Ok(asset) => asset,
+            Err(_) => return Err(ParseError::BadSymbol(parts[0].to_string())),
+        };
+        let contract = match Name::from_str(parts[1]) {
+            Ok(name) => name,
+            Err(_) => return Err(ParseError::BadName(parts[1].to_string())),
+        };
+
+        Ok(ExtendedSymbol::from_extended(symbol, contract))
+    }
+}
+
 impl From<&str> for ExtendedSymbol {
-    #[inline]
-    #[must_use]
-    fn from(str: &str) -> Self {
-        let parts = str.split('@').collect::<Vec<&str>>();
-        check(parts.len() == 2, "invalid extended symbol format");
-        let sym = Symbol::from(parts[0]);
-        check(sym.is_valid(), "invalid symbol precision");
-        let contract = Name::from(parts[1]);
-        ExtendedSymbol::from_extended(sym, contract)
+    fn from(s: &str) -> Self {
+        Self::from_str(s).unwrap_or_else(|e| panic!("failed to parse extended symbol: {}", e))
     }
 }
 

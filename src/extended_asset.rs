@@ -1,4 +1,6 @@
-use crate::{check, Asset, ExtendedSymbol, Name};
+use crate::{check, Asset, ExtendedSymbol, Name, ParseError};
+use std::str::FromStr;
+
 /// The `ExtendedAsset` struct represents an extended asset
 ///
 /// Reference: <https://github.com/AntelopeIO/cdt/blob/main/libraries/eosiolib/core/eosio/asset.hpp>
@@ -92,20 +94,39 @@ impl std::fmt::Display for ExtendedAsset {
     }
 }
 
+impl FromStr for ExtendedAsset {
+    type Err = ParseError;
+
+    /**
+     * Parse ExtendedAsset from string formatted as "1.2345 SYM@contract"
+     *
+     */
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let parts: Vec<&str> = s.split('@').collect();
+        if parts.len() != 2 {
+            return Err(ParseError::BadFormat);
+        }
+
+        let quantity = match Asset::from_str(parts[0]) {
+            Ok(asset) => asset,
+            Err(_) => return Err(ParseError::BadAsset(parts[0].to_string())),
+        };
+        let contract = match Name::from_str(parts[1]) {
+            Ok(name) => name,
+            Err(_) => return Err(ParseError::BadName(parts[1].to_string())),
+        };
+
+        Ok(ExtendedAsset::from_asset(quantity, contract))
+    }
+}
+
 impl From<&str> for ExtendedAsset {
     /**
      * Parse ExtendedAsset from string formatted as "1.2345 SYM@contract"
      *
      */
     fn from(s: &str) -> Self {
-        let parts: Vec<&str> = s.split('@').collect();
-
-        check(parts.len() == 2, "invalid extended asset format");
-
-        let quantity_str = parts[0];
-        let contract_str = parts[1];
-
-        ExtendedAsset::from_asset(Asset::from(quantity_str), Name::from(contract_str))
+        Self::from_str(s).unwrap_or_else(|e| panic!("failed to parse extended asset: {}", e))
     }
 }
 
@@ -310,7 +331,7 @@ impl std::ops::Div<ExtendedAsset> for ExtendedAsset {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Symbol;
+    use crate::{Symbol, SymbolCode};
 
     #[test]
     fn test_new_extended_asset() {
@@ -590,8 +611,28 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "invalid extended asset format")]
-    fn test_from_str_with_invalid_input() {
-        let _ = ExtendedAsset::from("1.0000SYM");
+    fn test_from_str_1() {
+        // Valid input
+        assert_eq!(
+            "1.2345 SYM@contract".parse::<ExtendedAsset>(),
+            Ok(ExtendedAsset::from_asset(
+                Asset::from_amount(12345, Symbol::from_precision(SymbolCode::from("SYM"), 4)),
+                Name::from("contract")
+            ))
+        );
+
+        // Invalid format (missing '@')
+        assert_eq!("1.2345 SYM-contract".parse::<ExtendedAsset>(), Err(ParseError::BadFormat));
+
+        // Invalid asset format
+        assert_eq!(
+            "1.2345SYM@contract".parse::<ExtendedAsset>(),
+            Err(ParseError::BadAsset(String::from("1.2345SYM")))
+        );
+
+        assert_eq!(
+            "1.2345 SYM@contr9ct".parse::<ExtendedAsset>(),
+            Err(ParseError::BadName(String::from("contr9ct")))
+        );
     }
 }

@@ -3,8 +3,9 @@ use core::str;
 use std::cmp::{Ord, Ordering, PartialEq, PartialOrd};
 use std::convert::From;
 use std::fmt;
+use std::str::FromStr;
 
-use crate::check;
+use crate::{check, ParseError};
 
 pub const NAME_CHARS: [u8; 32] = *b".12345abcdefghijklmnopqrstuvwxyz";
 
@@ -93,12 +94,12 @@ impl Name {
      *  @param c - Character to be converted
      *  @return char - Converted value or panic
      */
-    pub fn char_to_value(c: char) -> u8 {
+    pub fn char_to_value(c: char) -> Option<u8> {
         match c {
-            '.' => 0,
-            '1'..='5' => c as u8 - b'1' + 1,
-            'a'..='z' => c as u8 - b'a' + 6,
-            _ => panic!("character is not in allowed character set for names"),
+            '.' => Some(0),
+            '1'..='5' => Some(c as u8 - b'1' + 1),
+            'a'..='z' => Some(c as u8 - b'a' + 6),
+            _ => None,
         }
     }
 
@@ -216,6 +217,44 @@ impl fmt::Display for Name {
     }
 }
 
+impl FromStr for Name {
+    type Err = ParseError;
+
+    /**
+     *  Construct a new name given a string
+     *
+     *  @brief Construct a new name object initialising value with str
+     *  @param str - The string value which validated then converted to unit64_t
+     */
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let mut value = 0_u64;
+
+        if s.len() > 13 {
+            return Err(ParseError::BadName(s.to_string()));
+        }
+        if s.is_empty() {
+            return Ok(Self { value });
+        }
+
+        let n = std::cmp::min(s.len(), 12);
+        for i in 0..n {
+            value <<= 5;
+            let c = Name::char_to_value(s.chars().nth(i).unwrap()).ok_or(ParseError::BadName(s.to_string()))?;
+            value |= c as u64;
+        }
+        value <<= (4 + 5 * (12 - n));
+        if s.len() == 13 {
+            let v = Name::char_to_value(s.chars().nth(12).unwrap()).ok_or(ParseError::BadName(s.to_string()))?;
+            if v > 0x0F {
+                return Err(ParseError::BadName(s.to_string()));
+            }
+            value |= v as u64;
+        }
+
+        Ok(Self { value })
+    }
+}
+
 impl From<&str> for Name {
     /**
      * Construct a new name given an string.
@@ -225,26 +264,7 @@ impl From<&str> for Name {
      *
      */
     fn from(str: &str) -> Self {
-        let mut value = 0_u64;
-
-        check(str.len() <= 13, "string is too long to be a valid name");
-        if str.is_empty() {
-            return Self { value };
-        }
-
-        let n = std::cmp::min(str.len(), 12);
-        for i in 0..n {
-            value <<= 5;
-            value |= Name::char_to_value(str.chars().nth(i).unwrap()) as u64;
-        }
-        value <<= (4 + 5 * (12 - n));
-        if str.len() == 13 {
-            let v = Name::char_to_value(str.chars().nth(12).unwrap());
-            check(v <= 0x0F, "thirteenth character in name cannot be a letter that comes after j");
-            value |= v as u64;
-        }
-
-        Self { value }
+        Self::from_str(str).unwrap_or_else(|e| panic!("failed to parse name: {}", e))
     }
 }
 
@@ -291,6 +311,7 @@ impl From<Name> for bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::ParseError;
     use proptest::prelude::*;
 
     #[test]
@@ -559,43 +580,29 @@ mod tests {
 
     #[test]
     #[allow(unused)]
-    #[should_panic(expected = "character is not in allowed character set for names")]
     fn test_cdt_panic_1() {
-        Name::from("0");
+        assert_eq!(Name::from_str("0"), Err(ParseError::BadName("0".to_string())));
+        assert_eq!(
+            Name::from_str("111111111111k"),
+            Err(ParseError::BadName("111111111111k".to_string()))
+        );
+        assert_eq!(
+            Name::from_str("12345abcdefghj"),
+            Err(ParseError::BadName("12345abcdefghj".to_string()))
+        );
+        assert_eq!(Name::from_str("0"), Err(ParseError::BadName("0".to_string())));
+        assert_eq!(Name::from_str("0"), Err(ParseError::BadName("0".to_string())));
+        assert_eq!(Name::from_str("0"), Err(ParseError::BadName("0".to_string())));
     }
 
     #[test]
-    #[allow(unused)]
-    #[should_panic(expected = "thirteenth character in name cannot be a letter that comes after j")]
-    fn test_cdt_panic_2() {
-        Name::from("111111111111k");
-    }
-
-    #[test]
-    #[allow(unused)]
-    #[should_panic(expected = "string is too long to be a valid name")]
-    fn test_cdt_panic_3() {
-        Name::from("12345abcdefghj");
-    }
-
-    #[test]
-    #[allow(unused)]
-    #[should_panic(expected = "character is not in allowed character set for names")]
-    fn test_cdt_panic_4() {
-        Name::char_to_value('-');
-        Name::char_to_value('/');
-        Name::char_to_value('6');
-        Name::char_to_value('A');
-        Name::char_to_value('Z');
-        Name::char_to_value('`');
-        Name::char_to_value('{');
-    }
-
-    #[test]
-    #[allow(unused)]
-    #[should_panic(expected = "string is too long to be a valid name")]
-    fn test_cdt_panic_5() {
-        Name::from("12345abcdefghj").length();
+    fn char_to_value() {
+        assert_eq!(Name::char_to_value('-'), None);
+        assert_eq!(Name::char_to_value('/'), None);
+        assert_eq!(Name::char_to_value('A'), None);
+        assert_eq!(Name::char_to_value('6'), None);
+        assert_eq!(Name::char_to_value('{'), None);
+        assert_eq!(Name::char_to_value('`'), None);
     }
 
     #[test]
@@ -643,10 +650,8 @@ mod tests {
             prop_assert_eq!(name.to_string(), input);
         }
         #[test]
-        #[should_panic(expected = "character is not in allowed character set for names")]
         fn bad_chars(input in "[[A-Z][6-9][!@#$%^&*()💔]]{1}") {
-            let name = Name::from(input.as_str());
-            prop_assert_eq!(name.to_string(), input);
+            prop_assert_eq!(Name::from_str(input.as_str()), Err(ParseError::BadName(input.to_string())));
         }
     }
 }

@@ -1,8 +1,9 @@
-use crate::{check, SymbolCode};
+use crate::{ParseError, SymbolCode};
 
 use std::cmp::{Ord, PartialEq, PartialOrd};
 use std::convert::From;
-use std::fmt::{Display, Formatter, Result};
+use std::fmt::{Display, Formatter};
+use std::str::FromStr;
 
 /// The `Symbol` struct represents a symbol
 ///
@@ -89,8 +90,29 @@ impl Symbol {
 
 impl Display for Symbol {
     #[inline]
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.write_str(format!("{},{}", self.precision(), self.code()).as_str())
+    }
+}
+
+impl FromStr for Symbol {
+    type Err = ParseError;
+
+    #[inline]
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let parts = s.split(',').collect::<Vec<&str>>();
+        if parts.len() != 2 {
+            return Err(ParseError::BadFormat);
+        }
+        let precision = match parts[0].parse::<u8>() {
+            Ok(p) => p,
+            Err(_) => return Err(ParseError::BadPrecision(parts[0].to_string())),
+        };
+        let symcode = match SymbolCode::from_str(parts[1]) {
+            Ok(sc) => sc,
+            Err(_) => return Err(ParseError::BadSymbolCode(parts[1].to_string())),
+        };
+        Ok(Symbol::from_precision(symcode, precision))
     }
 }
 
@@ -98,12 +120,7 @@ impl From<&str> for Symbol {
     #[inline]
     #[must_use]
     fn from(str: &str) -> Self {
-        let parts = str.split(',').collect::<Vec<&str>>();
-        check(parts.len() == 2, "invalid symbol format");
-        let precision = parts[0].parse::<u8>();
-        check(precision.is_ok(), "invalid symbol precision");
-        let symcode = SymbolCode::from(parts[1]);
-        Symbol::from_precision(symcode, precision.unwrap())
+        Self::from_str(str).unwrap_or_else(|e| panic!("failed to parse symbol: {}", e))
     }
 }
 
@@ -276,28 +293,28 @@ mod tests {
 
     #[test]
     #[allow(unused)]
-    #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
+    #[should_panic(expected = "failed to parse symbol: bad symbol code: a")]
     fn test_from_str_panic_1() {
         Symbol::from("10,a");
     }
 
     #[test]
     #[allow(unused)]
-    #[should_panic(expected = "invalid symbol precision")]
+    #[should_panic(expected = "failed to parse symbol: bad precision: 1000")]
     fn test_from_str_panic_2() {
         Symbol::from("1000,SYM");
     }
 
     #[test]
     #[allow(unused)]
-    #[should_panic(expected = "invalid symbol format")]
+    #[should_panic(expected = "failed to parse symbol: bad format")]
     fn test_from_str_panic_3() {
         Symbol::from("10SYM");
     }
 
     #[test]
     #[allow(unused)]
-    #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
+    #[should_panic(expected = "bad symbol code: SYM,10")]
     fn test_from_str_panic_4() {
         SymbolCode::from("SYM,10");
     }
@@ -306,6 +323,16 @@ mod tests {
     fn test_from_self() {
         let sym = Symbol::from("4,ABCDEFG");
         assert_eq!(Symbol::from(sym), sym);
+    }
+
+    #[test]
+    fn test_from_str_failed() {
+        assert_eq!(
+            "4,ABCDEFGH".parse::<Symbol>(),
+            Err(ParseError::BadSymbolCode("ABCDEFGH".to_string()))
+        );
+        assert_eq!("".parse::<Symbol>(), Err(ParseError::BadFormat));
+        assert_eq!("A,B".parse::<Symbol>(), Err(ParseError::BadPrecision("A".to_string())));
     }
 
     proptest! {

@@ -25,6 +25,10 @@
 pub mod check;
 pub use self::check::*;
 
+/// Error types.
+pub mod errors;
+pub use self::errors::*;
+
 /// Modules for Symbol Code type.
 pub mod symbol_code;
 pub use self::symbol_code::*;

@@ -1,7 +1,9 @@
-use crate::check;
 use std::cmp::{Ord, PartialEq, PartialOrd};
 use std::convert::From;
-use std::fmt::{Display, Formatter, Result};
+use std::fmt::{Display, Formatter};
+use std::str::FromStr;
+
+use crate::ParseError;
 
 /// The `SymbolCode` struct represents a symbol code
 ///
@@ -149,7 +151,7 @@ impl SymbolCode {
 
 impl Display for SymbolCode {
     #[inline]
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mask = 0x00000000000000FF;
         if self.value == 0 {
             return Result::Ok(());
@@ -175,14 +177,28 @@ impl From<&str> for SymbolCode {
     #[inline]
     #[must_use]
     fn from(str: &str) -> Self {
+        Self::from_str(str).unwrap_or_else(|e| panic!("{}", e))
+    }
+}
+
+impl FromStr for SymbolCode {
+    type Err = ParseError;
+
+    #[inline]
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         let mut value: u64 = 0;
-        check(str.len() <= 7, "string is too long to be a valid symbol_code");
-        for c in str.chars().rev() {
-            check(c.is_ascii_uppercase(), "only uppercase letters allowed in symbol_code string");
+        if s.len() > 7 {
+            return Err(ParseError::BadSymbolCode(s.to_string()));
+        }
+        for c in s.chars().rev() {
+            // only uppercase
+            if !c.is_ascii_uppercase() {
+                return Err(ParseError::BadSymbolCode(s.to_string()));
+            }
             value <<= 8;
             value |= c as u64;
         }
-        SymbolCode { value }
+        Ok(SymbolCode { value })
     }
 }
 
@@ -321,21 +337,21 @@ mod tests {
 
     #[test]
     #[allow(unused)]
-    #[should_panic(expected = "string is too long to be a valid symbol_code")]
+    #[should_panic(expected = "bad symbol code: ABCDEFGH")]
     fn test_cdt_panic_1() {
         SymbolCode::from("ABCDEFGH");
     }
 
     #[test]
     #[allow(unused)]
-    #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
+    #[should_panic(expected = "bad symbol code: a")]
     fn test_cdt_panic_2a() {
         SymbolCode::from("a");
     }
 
     #[test]
     #[allow(unused)]
-    #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
+    #[should_panic(expected = "bad symbol code: @")]
     fn test_cdt_panic_2b() {
         SymbolCode::from("@");
     }
@@ -420,21 +436,21 @@ mod tests {
 
     #[test]
     #[allow(unused)]
-    #[should_panic(expected = "string is too long to be a valid symbol_code")]
+    #[should_panic(expected = "bad symbol code: ABCDEFGH")]
     fn test_from_string_long_panic_1() {
         SymbolCode::from("ABCDEFGH");
     }
 
     #[test]
     #[allow(unused)]
-    #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
+    #[should_panic(expected = "bad symbol code: abc")]
     fn test_from_string_letters_panic_1() {
         SymbolCode::from("abc");
     }
 
     #[test]
     #[allow(unused)]
-    #[should_panic(expected = "only uppercase letters allowed in symbol_code string")]
+    #[should_panic(expected = "bad symbol code: 123")]
     fn test_from_string_letters_panic_2() {
         SymbolCode::from("123");
     }
@@ -464,6 +480,18 @@ mod tests {
     fn test_from_self() {
         let symcode = SymbolCode::from("ABCDEFG");
         assert_eq!(SymbolCode::from(symcode), symcode);
+    }
+
+    #[test]
+    fn test_from_str() {
+        assert_eq!(SymbolCode::from_str("ABCDEFG").unwrap().to_string(), "ABCDEFG");
+        assert_eq!("ABCD1F".parse::<SymbolCode>(), Err(ParseError::BadSymbolCode("ABCD1F".to_string())));
+        assert_eq!("a".parse::<SymbolCode>(), Err(ParseError::BadSymbolCode("a".to_string())));
+        assert_eq!("".parse::<SymbolCode>(), Ok(SymbolCode { value: 0 }));
+        assert_eq!(
+            "ABCDEFGH".parse::<SymbolCode>(),
+            Err(ParseError::BadSymbolCode("ABCDEFGH".to_string()))
+        );
     }
 
     #[test]

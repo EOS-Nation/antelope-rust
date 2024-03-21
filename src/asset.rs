@@ -1,4 +1,6 @@
-use crate::{check, Symbol, SymbolCode};
+use std::str::FromStr;
+
+use crate::{check, ParseError, Symbol, SymbolCode};
 // use std::convert::From;
 /// The `Asset` struct represents a asset
 ///
@@ -103,8 +105,19 @@ impl From<&str> for Asset {
      *
      */
     fn from(s: &str) -> Self {
+        Self::from_str(s).unwrap_or_else(|e| panic!("failed to parse asset from string: {}", e))
+    }
+}
+
+impl FromStr for Asset {
+    type Err = ParseError;
+
+    #[inline]
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         let parts: Vec<&str> = s.split(' ').collect();
-        check(parts.len() == 2, &format!("invalid asset: {s}"));
+        if parts.len() != 2 {
+            return Err(ParseError::BadFormat);
+        }
         let (amount_str, symbol_str) = (parts[0], parts[1]);
         let precision = match amount_str.find('.') {
             Some(idx) => (amount_str.len() - idx - 1) as u8,
@@ -112,11 +125,14 @@ impl From<&str> for Asset {
         };
         let amount = match amount_str.replace('.', "").parse::<i64>() {
             Ok(amount) => amount,
-            Err(_) => panic!("invalid asset: {s}"),
+            Err(_) => return Err(ParseError::BadAmount(amount_str.to_string())),
         };
-        let symbol = Symbol::from_precision(SymbolCode::from(symbol_str), precision);
+        let sym_code = symbol_str
+            .parse::<SymbolCode>()
+            .map_err(|_| ParseError::BadSymbolCode(symbol_str.to_string()))?;
+        let symbol = Symbol::from_precision(sym_code, precision);
 
-        Asset { amount, symbol }
+        Ok(Asset { amount, symbol })
     }
 }
 
@@ -792,22 +808,47 @@ mod tests {
     }
 
     #[test]
-    fn test_from_string() {
-        assert_eq!(Asset::from_amount(10000, Symbol::from("4,SYM")), Asset::from("1.0000 SYM"));
-        assert_eq!(Asset::from_amount(100, Symbol::from("0,SYM")), Asset::from("100 SYM"));
-        assert_eq!(Asset::from_amount(12345, Symbol::from("2,SYM")), Asset::from("123.45 SYM"));
-        assert_eq!(Asset::from_amount(-1000001, Symbol::from("4,SYM")), Asset::from("-100.0001 SYM"));
-        assert_eq!(Asset::from_amount(0, Symbol::from("0,SYM")), Asset::from("0 SYM"));
-        assert_eq!(Asset::from_amount(0, Symbol::from("4,SYM")), Asset::from("0.0000 SYM"));
-        assert_eq!(Asset::from_amount(1, Symbol::from("4,SYM")), Asset::from("0.0001 SYM"));
+    fn test_from_str() {
+        assert_eq!(Asset::from_amount(10000, Symbol::from("4,SYM")), "1.0000 SYM".parse().unwrap());
+        assert_eq!(Asset::from_amount(100, Symbol::from("0,SYM")), "100 SYM".parse().unwrap());
+        assert_eq!(Asset::from_amount(12345, Symbol::from("2,SYM")), "123.45 SYM".parse().unwrap());
+        assert_eq!(
+            Asset::from_amount(-1000001, Symbol::from("4,SYM")),
+            "-100.0001 SYM".parse().unwrap()
+        );
+        assert_eq!(Asset::from_amount(0, Symbol::from("0,SYM")), "0 SYM".parse().unwrap());
+        assert_eq!(Asset::from_amount(0, Symbol::from("4,SYM")), "0.0000 SYM".parse().unwrap());
+        assert_eq!(Asset::from_amount(1, Symbol::from("4,SYM")), "0.0001 SYM".parse().unwrap());
         assert_eq!(
             Asset::from_amount(-1000000000000000000, Symbol::from("18,SYMBOLL")),
-            Asset::from("-1.000000000000000000 SYMBOLL")
+            "-1.000000000000000000 SYMBOLL".parse().unwrap()
         );
-        // see: https://github.com/pinax-network/antelope.rs/issues/13
         assert_eq!(
             Asset::from_amount(10000000000001, Symbol::from("69,JIAYOUY")),
-            Asset::from("0.000000000000000000000000000000000000000000000000000000010000000000001 JIAYOUY")
+            "0.000000000000000000000000000000000000000000000000000000010000000000001 JIAYOUY"
+                .parse()
+                .unwrap()
+        );
+    }
+
+    #[test]
+    fn test_from_str_failed() {
+        assert_eq!("".parse::<Asset>(), Err(ParseError::BadFormat));
+        assert_eq!("-".parse::<Asset>(), Err(ParseError::BadFormat));
+        assert_eq!("- EOS".parse::<Asset>(), Err(ParseError::BadAmount("-".to_string())));
+        assert_eq!("1s EOS".parse::<Asset>(), Err(ParseError::BadAmount("1s".to_string())));
+        assert_eq!("1\nEOS".parse::<Asset>(), Err(ParseError::BadFormat));
+        assert_eq!("- 100 EOS".parse::<Asset>(), Err(ParseError::BadFormat));
+        assert_eq!("-".parse::<Asset>(), Err(ParseError::BadFormat));
+        assert_eq!("1.0000".parse::<Asset>(), Err(ParseError::BadFormat));
+        assert_eq!("10000".parse::<Asset>(), Err(ParseError::BadFormat));
+        assert_eq!(
+            "10000 LONGSYMBOL".parse::<Asset>(),
+            Err(ParseError::BadSymbolCode("LONGSYMBOL".to_string()))
+        );
+        assert_eq!(
+            "-0.0000000000000000000000000000000000000000000000000004371526177016610288 \\u0005".parse::<Asset>(),
+            Err(ParseError::BadSymbolCode("\\u0005".to_string())),
         );
     }
 
